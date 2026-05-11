@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>翘屁股计划</title>
+  <style>
+    :root {
+      --bg: #f6f8fc;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --primary: #0f766e;
+      --primary2: #0d9488;
+      --danger: #b91c1c;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, #eef6ff 0%, var(--bg) 45%);
+    }
+    .wrap { max-width: 1020px; margin: 0 auto; padding: 14px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      box-shadow: 0 4px 14px rgba(17,24,39,.06);
+    }
+    .person-card { display: none; border-left: 5px solid #14b8a6; }
+    .person-card.active { display: block; }
+
+    h1 { margin: 0 0 6px; font-size: 24px; }
+    h2 { margin: 0 0 10px; font-size: 16px; }
+    h3 { margin: 0 0 10px; font-size: 18px; color: #0f766e; }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .grid { display: grid; gap: 10px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+    label { display: block; font-size: 13px; margin-bottom: 5px; color: #374151; }
+    input, select, textarea, button {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px;
+      font-size: 14px;
+      background: #fff;
+      color: #111827;
+    }
+    textarea { min-height: 82px; resize: vertical; }
+
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tab-btn {
+      border: 1px solid var(--line);
+      background: #f3f4f6;
+      color: #111827;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+    .btn { border: none; color: #fff; font-weight: 600; background: var(--primary); cursor: pointer; }
+    .btn-secondary { background: var(--primary2); }
+    .btn-danger { background: var(--danger); }
+
+    .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table {
+      border-collapse: collapse;
+      min-width: 900px;
+      width: 100%;
+      font-size: 13px;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 8px 6px;
+      text-align: center;
+      vertical-align: middle;
+    }
+    th { background: #f9fafb; font-weight: 700; }
+    td input { min-width: 74px; padding: 7px 6px; font-size: 13px; border-radius: 8px; }
+    td .narrow { min-width: 56px; }
+    .left { text-align: left; }
+
+    .ok { color: #065f46; font-size: 13px; margin-top: 8px; min-height: 18px; }
+    .history-box {
+      border: 1px dashed #94a3b8;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 10px;
+      background: #f8fafc;
+    }
+    .small-btn {
+      width: auto;
+      padding: 6px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+      margin-right: 6px;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      background: #0f766e;
+    }
+    .small-btn.danger { background: #b91c1c; }
+
+    @media (max-width: 900px) {
+      .grid-4 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      h1 { font-size: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>翘屁股计划</h1>
+      <div class="muted">A=妞妞，B=牛牛。支持训练类型联动动作表、按日期历史记录、日期对比分析。</div>
+    </div>
+
+    <div class="card">
+      <h2>全局信息</h2>
+      <div class="grid grid-3">
+        <div>
+          <label for="trainDate">日期</label>
+          <input id="trainDate" type="date">
+        </div>
+        <div>
+          <label for="sessionTheme">训练主题</label>
+          <select id="sessionTheme">
+            <option value="减脂塑形周">减脂塑形周</option>
+            <option value="翘臀强化周">翘臀强化周</option>
+            <option value="恢复减量周">恢复减量周</option>
+            <option value="自定义">自定义</option>
+          </select>
+        </div>
+        <div id="customThemeWrap" style="display:none;">
+          <label for="customTheme">自定义主题</label>
+          <input id="customTheme" type="text" placeholder="例如：第3周冲刺">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>切换训练者</h2>
+      <div class="tabs">
+        <button id="tab-a" class="tab-btn active" type="button">A｜妞妞</button>
+        <button id="tab-b" class="tab-btn" type="button">B｜牛牛</button>
+      </div>
+    </div>
+
+    <div id="person-card-a" class="card person-card active">
+      <h3>训练者A（妞妞）</h3>
+      <div class="grid grid-4">
+        <div><label>姓名</label><input id="name-a" type="text" value="妞妞" readonly></div>
+        <div>
+          <label for="type-a">训练类型</label>
+          <select id="type-a" onchange="onTrainingTypeChange('a')">
+            <option value="上肢B（拉）">上肢B（拉）</option>
+            <option value="上肢A（推）">上肢A（推）</option>
+            <option value="腿1（臀主导）">腿1（臀主导）</option>
+            <option value="腿2（臀腿）">腿2（臀腿）</option>
+            <option value="有氧+核心">有氧+核心</option>
+          </select>
+        </div>
+        <div><label for="duration-a">训练时长（分钟）</label><input id="duration-a" type="number"></div>
+        <div><label for="morningWeight-a">早晨体重（kg）</label><input id="morningWeight-a" type="number" step="0.1"></div>
+      </div>
+      <h2 style="margin-top:12px;">热身</h2>
+      <div class="grid grid-3">
+        <div><label for="warm1-a">快走/椭圆机（分钟）</label><input id="warm1-a" type="number"></div>
+        <div><label for="warm2-a">弹力带肩胛后缩（组×次）</label><input id="warm2-a" type="text"></div>
+        <div><label for="warm3-a">弹力带下拉（组×次）</label><input id="warm3-a" type="text"></div>
+      </div>
+      <h2 style="margin-top:12px;">力量记录（随训练类型变化）</h2>
+      <div class="scroll"><table><thead><tr>
+        <th>动作</th><th>组次</th><th>目标次数/时长</th><th>计划重量<br>kg(lb)</th>
+        <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
+      </tr></thead><tbody id="tbody-a"></tbody></table></div>
+      <h2 style="margin-top:12px;">有氧与拉伸</h2>
+      <div class="grid grid-2">
+        <div><label for="cardio-a">有氧记录</label><textarea id="cardio-a"></textarea></div>
+        <div><label for="stretch-a">拉伸记录</label><textarea id="stretch-a"></textarea></div>
+      </div>
+      <div style="margin-top:10px;"><label for="feeling-a">主观感受</label><textarea id="feeling-a"></textarea></div>
+    </div>
+
+    <div id="person-card-b" class="card person-card">
+      <h3>训练者B（牛牛）</h3>
+      <div class="grid grid-4">
+        <div><label>姓名</label><input id="name-b" type="text" value="牛牛" readonly></div>
+        <div>
+          <label for="type-b">训练类型</label>
+          <select id="type-b" onchange="onTrainingTypeChange('b')">
+            <option value="上肢B（拉）">上肢B（拉）</option>
+            <option value="上肢A（推）">上肢A（推）</option>
+            <option value="腿1（臀主导）">腿1（臀主导）</option>
+            <option value="腿2（臀腿）">腿2（臀腿）</option>
+            <option value="有氧+核心">有氧+核心</option>
+          </select>
+        </div>
+        <div><label for="duration-b">训练时长（分钟）</label><input id="duration-b" type="number"></div>
+        <div><label for="morningWeight-b">早晨体重（kg）</label><input id="morningWeight-b" type="number" step="0.1"></div>
+      </div>
+      <h2 style="margin-top:12px;">热身</h2>
+      <div class="grid grid-3">
+        <div><label for="warm1-b">快走/椭圆机（分钟）</label><input id="warm1-b" type="number"></div>
+        <div><label for="warm2-b">弹力带肩胛后缩（组×次）</label><input id="warm2-b" type="text"></div>
+        <div><label for="warm3-b">弹力带下拉（组×次）</label><input id="warm3-b" type="text"></div>
+      </div>
+      <h2 style="margin-top:12px;">力量记录（随训练类型变化）</h2>
+      <div class="scroll"><table><thead><tr>
+        <th>动作</th><th>组次</th><th>目标次数/时长</th><th>计划重量<br>kg(lb)</th>
+        <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
+      </tr></thead><tbody id="tbody-b"></tbody></table></div>
+      <h2 style="margin-top:12px;">有氧与拉伸</h2>
+      <div class="grid grid-2">
+        <div><label for="cardio-b">有氧记录</label><textarea id="cardio-b"></textarea></div>
+        <div><label for="stretch-b">拉伸记录</label><textarea id="stretch-b"></textarea></div>
+      </div>
+      <div style="margin-top:10px;"><label for="feeling-b">主观感受</label><textarea id="feeling-b"></textarea></div>
+    </div>
+
+    <div class="card">
+      <div class="grid grid-3">
+        <button class="btn" id="saveDraftBtn" type="button">保存草稿</button>
+        <button class="btn btn-secondary" id="saveHistoryBtn" type="button">保存到历史（按日期）</button>
+        <button class="btn btn-secondary" id="copyBothBtn" type="button">复制双人汇总文本</button>
+        <button class="btn btn-secondary" id="downloadTxtBtn" type="button">下载双人 TXT</button>
+        <button class="btn btn-secondary" id="downloadJsonBtn" type="button">下载双人 JSON</button>
+        <button class="btn btn-danger" id="resetBtn" type="button">清空当前页</button>
+      </div>
+      <div id="msg" class="ok"></div>
+    </div>
+
+    <div class="card">
+      <h2>历史记录与日期对比</h2>
+      <div class="grid grid-3">
+        <div>
+          <label for="comparePerson">对比对象</label>
+          <select id="comparePerson">
+            <option value="a">妞妞</option>
+            <option value="b">牛牛</option>
+          </select>
+        </div>
+        <div>
+          <label for="compareDate1">日期A</label>
+          <select id="compareDate1"></select>
+        </div>
+        <div>
+          <label for="compareDate2">日期B</label>
+          <select id="compareDate2"></select>
+        </div>
+      </div>
+      <div style="margin-top:10px;" class="grid grid-2">
+        <button class="btn btn-secondary" id="compareBtn" type="button">生成日期对比</button>
+        <button class="btn btn-secondary" id="refreshHistoryBtn" type="button">刷新历史列表</button>
+      </div>
+      <div id="compareResult" class="history-box"></div>
+      <div id="historyList" class="history-box"></div>
+    </div>
+  </div>
+
+  <script>
+    var DRAFT_KEY = "qiaopigu_plan_draft_v1";
+    var HISTORY_KEY = "qiaopigu_plan_history_v1";
+    var activePersonId = "a";
+
+    var templates = {
+      "上肢B（拉）": [
+        ["高位下拉", 1, "10", "15 (33)"], ["高位下拉", 2, "10", "17.5 (38.5)"], ["高位下拉", 3, "10", "17.5 (38.5)"], ["高位下拉", 4, "10", "20 (44)"],
+        ["坐姿划船", 1, "12", "15 (33)"], ["坐姿划船", 2, "12", "17.5 (38.5)"], ["坐姿划船", 3, "12", "17.5 (38.5)"], ["坐姿划船", 4, "12", "20 (44)"],
+        ["单臂哑铃划船（每侧）", 1, "10", "5 (11)"], ["单臂哑铃划船（每侧）", 2, "10", "5 (11)"], ["单臂哑铃划船（每侧）", 3, "10", "6 (13.2)"],
+        ["直臂下压", 1, "15", "7.5 (16.5)"], ["直臂下压", 2, "15", "7.5 (16.5)"], ["直臂下压", 3, "15", "10 (22)"]
+      ],
+      "上肢A（推）": [
+        ["哑铃卧推", 1, "10", "6 (13.2)"], ["哑铃卧推", 2, "10", "6 (13.2)"], ["哑铃卧推", 3, "10", "8 (17.6)"], ["哑铃卧推", 4, "10", "8 (17.6)"],
+        ["上斜哑铃推举", 1, "10", "5 (11)"], ["上斜哑铃推举", 2, "10", "6 (13.2)"], ["上斜哑铃推举", 3, "10", "6 (13.2)"],
+        ["坐姿推肩", 1, "10", "5 (11)"], ["坐姿推肩", 2, "10", "5 (11)"], ["坐姿推肩", 3, "10", "6 (13.2)"],
+        ["侧平举", 1, "15", "2 (4.4)"], ["侧平举", 2, "15", "2 (4.4)"], ["侧平举", 3, "15", "3 (6.6)"]
+      ],
+      "腿1（臀主导）": [
+        ["高脚杯深蹲", 1, "10", "8 (17.6)"], ["高脚杯深蹲", 2, "10", "10 (22)"], ["高脚杯深蹲", 3, "10", "10 (22)"], ["高脚杯深蹲", 4, "10", "12 (26.4)"],
+        ["杠铃臀推", 1, "12", "20 (44)"], ["杠铃臀推", 2, "12", "25 (55)"], ["杠铃臀推", 3, "12", "30 (66)"], ["杠铃臀推", 4, "12", "30 (66)"],
+        ["腿举机", 1, "12", "40 (88)"], ["腿举机", 2, "12", "50 (110)"], ["腿举机", 3, "12", "60 (132)"],
+        ["哑铃罗马尼亚硬拉", 1, "12", "6 (13.2)"], ["哑铃罗马尼亚硬拉", 2, "12", "6 (13.2)"], ["哑铃罗马尼亚硬拉", 3, "12", "8 (17.6)"]
+      ],
+      "腿2（臀腿）": [
+        ["保加利亚分腿蹲（每侧）", 1, "10", "4 (8.8)"], ["保加利亚分腿蹲（每侧）", 2, "10", "5 (11)"], ["保加利亚分腿蹲（每侧）", 3, "10", "6 (13.2)"],
+        ["杠铃臀推", 1, "10", "25 (55)"], ["杠铃臀推", 2, "10", "30 (66)"], ["杠铃臀推", 3, "10", "35 (77)"], ["杠铃臀推", 4, "10", "35 (77)"],
+        ["腿弯举", 1, "15", "15 (33)"], ["腿弯举", 2, "15", "20 (44)"], ["腿弯举", 3, "15", "20 (44)"],
+        ["髋外展机", 1, "20", "25 (55)"], ["髋外展机", 2, "20", "30 (66)"], ["髋外展机", 3, "20", "35 (77)"]
+      ],
+      "有氧+核心": [
+        ["平板支撑", 1, "45秒", "-"], ["平板支撑", 2, "45秒", "-"], ["平板支撑", 3, "45秒", "-"],
+        ["死虫", 1, "12/侧", "-"], ["死虫", 2, "12/侧", "-"], ["死虫", 3, "12/侧", "-"],
+        ["俄罗斯转体", 1, "20", "4 (8.8)"], ["俄罗斯转体", 2, "20", "4 (8.8)"], ["俄罗斯转体", 3, "20", "4 (8.8)"],
+        ["跑步机坡走", 1, "15分钟", "-"], ["椭圆机", 1, "10分钟", "-"]
+      ]
+    };
+
+    var state = {
+      a: { currentType: "上肢B（拉）", rowsByType: {} },
+      b: { currentType: "上肢B（拉）", rowsByType: {} }
+    };
+
+    function todayStr() {
+      var d = new Date();
+      var y = d.getFullYear();
+      var m = String(d.getMonth() + 1).padStart(2, "0");
+      var day = String(d.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + day;
+    }
+
+    function setActivePerson(pid) {
+      activePersonId = pid;
+      var cardA = document.getElementById("person-card-a");
+      var cardB = document.getElementById("person-card-b");
+      var tabA = document.getElementById("tab-a");
+      var tabB = document.getElementById("tab-b");
+      if (pid === "a") {
+        cardA.classList.add("active"); cardB.classList.remove("active");
+        tabA.classList.add("active"); tabB.classList.remove("active");
+      } else {
+        cardB.classList.add("active"); cardA.classList.remove("active");
+        tabB.classList.add("active"); tabA.classList.remove("active");
+      }
+    }
+
+    function rowInputId(pid, idx, key) {
+      return "r-" + pid + "-" + idx + "-" + key;
+    }
+
+    function buildRows(pid, typeName, preloadRows) {
+      var tbody = document.getElementById("tbody-" + pid);
+      var tpl = templates[typeName] || [];
+      tbody.innerHTML = "";
+
+      for (var i = 0; i < tpl.length; i++) {
+        var r = tpl[i];
+        var saved = preloadRows && preloadRows[i] ? preloadRows[i] : null;
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td class='left'>" + r[0] + "</td>" +
+          "<td>" + r[1] + "</td>" +
+          "<td>" + r[2] + "</td>" +
+          "<td>" + r[3] + "</td>" +
+          "<td><input id='" + rowInputId(pid, i, "w") + "' class='narrow' inputmode='decimal' value='" + esc(saved ? saved.actualWeightKg : "") + "'></td>" +
+          "<td><input id='" + rowInputId(pid, i, "rep") + "' class='narrow' value='" + esc(saved ? saved.actualRep : "") + "'></td>" +
+          "<td><input id='" + rowInputId(pid, i, "rpe") + "' class='narrow' inputmode='decimal' value='" + esc(saved ? saved.rpe : "") + "'></td>" +
+          "<td><input id='" + rowInputId(pid, i, "note") + "' value='" + esc(saved ? saved.note : "") + "'></td>";
+        tbody.appendChild(tr);
+      }
+    }
+
+    function esc(s) {
+      if (s === null || s === undefined) return "";
+      return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function getCurrentRows(pid, typeName) {
+      var tpl = templates[typeName] || [];
+      var rows = [];
+      for (var i = 0; i < tpl.length; i++) {
+        rows.push({
+          action: tpl[i][0],
+          set: tpl[i][1],
+          targetRep: tpl[i][2],
+          planWeight: tpl[i][3],
+          actualWeightKg: getVal(rowInputId(pid, i, "w")),
+          actualRep: getVal(rowInputId(pid, i, "rep")),
+          rpe: getVal(rowInputId(pid, i, "rpe")),
+          note: getVal(rowInputId(pid, i, "note"))
+        });
+      }
+      return rows;
+    }
+
+    function onTrainingTypeChange(pid) {
+      var typeEl = document.getElementById("type-" + pid);
+      var newType = typeEl.value;
+      var oldType = state[pid].currentType;
+
+      state[pid].rowsByType[oldType] = getCurrentRows(pid, oldType);
+      state[pid].currentType = newType;
+
+      var preload = state[pid].rowsByType[newType] || null;
+      buildRows(pid, newType, preload);
+    }
+
+    function getVal(id) {
+      var el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function setVal(id, v) {
+      var el = document.getElementById(id);
+      if (el) el.value = v || "";
+    }
+
+    function collectPerson(pid) {
+      var typeName = getVal("type-" + pid) || "上肢B（拉）";
+      state[pid].rowsByType[typeName] = getCurrentRows(pid, typeName);
+
+      return {
+        id: pid,
+        name: getVal("name-" + pid),
+        trainingType: typeName,
+        duration: getVal("duration-" + pid),
+        morningWeight: getVal("morningWeight-" + pid),
+        warmup1: getVal("warm1-" + pid),
+        warmup2: getVal("warm2-" + pid),
+        warmup3: getVal("warm3-" + pid),
+        rowsByType: state[pid].rowsByType,
+        cardio: getVal("cardio-" + pid),
+        stretch: getVal("stretch-" + pid),
+        feeling: getVal("feeling-" + pid)
+      };
+    }
+
+    function getThemeText() {
+      var theme = getVal("sessionTheme");
+      if (theme === "自定义") {
+        var custom = getVal("customTheme");
+        return custom || "自定义";
+      }
+      return theme;
+    }
+
+    function collectAll() {
+      return {
+        date: getVal("trainDate") || todayStr(),
+        themeSelect: getVal("sessionTheme"),
+        customTheme: getVal("customTheme"),
+        themeText: getThemeText(),
+        activePersonId: activePersonId,
+        people: {
+          a: collectPerson("a"),
+          b: collectPerson("b")
+        }
+      };
+    }
+
+    function applyPerson(pid, p) {
+      p = p || {};
+      setVal("name-" + pid, p.name || (pid === "a" ? "妞妞" : "牛牛"));
+      setVal("type-" + pid, p.trainingType || "上肢B（拉）");
+      setVal("duration-" + pid, p.duration || "");
+      setVal("morningWeight-" + pid, p.morningWeight || "");
+      setVal("warm1-" + pid, p.warmup1 || "");
+      setVal("warm2-" + pid, p.warmup2 || "");
+      setVal("warm3-" + pid, p.warmup3 || "");
+      setVal("cardio-" + pid, p.cardio || "");
+      setVal("stretch-" + pid, p.stretch || "");
+      setVal("feeling-" + pid, p.feeling || "");
+
+      state[pid].rowsByType = p.rowsByType || {};
+      state[pid].currentType = getVal("type-" + pid) || "上肢B（拉）";
+      var preload = state[pid].rowsByType[state[pid].currentType] || null;
+      buildRows(pid, state[pid].currentType, preload);
+    }
+
+    function applyAll(data) {
+      data = data || {};
+      setVal("trainDate", data.date || todayStr());
+      setVal("sessionTheme", data.themeSelect || "减脂塑形周");
+      setVal("customTheme", data.customTheme || "");
+      toggleCustomTheme();
+
+      var pa = data.people && data.people.a ? data.people.a : null;
+      var pb = data.people && data.people.b ? data.people.b : null;
+      applyPerson("a", pa);
+      applyPerson("b", pb);
+      setActivePerson(data.activePersonId === "b" ? "b" : "a");
+    }
+
+    function saveDraft() {
+      var data = collectAll();
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        showMsg("已保存草稿。");
+      } catch (e) {
+        showMsg("草稿保存失败（浏览器限制）。");
+      }
+    }
+
+    function loadDraft() {
+      var raw = null;
+      try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { raw = null; }
+      if (!raw) return false;
+      try {
+        applyAll(JSON.parse(raw));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    function loadHistory() {
+      var raw = null;
+      try { raw = localStorage.getItem(HISTORY_KEY); } catch (e) { raw = null; }
+      if (!raw) return [];
+      try {
+        var arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function saveHistory(arr) {
+      try {
+        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
+      } catch (e) {
+        showMsg("历史保存失败（浏览器限制）。");
+      }
+    }
+
+    function saveToHistory() {
+      var data = collectAll();
+      var history = loadHistory();
+      var replaced = false;
+
+      for (var i = 0; i < history.length; i++) {
+        if (history[i].date === data.date) {
+          history[i] = data;
+          replaced = true;
+          break;
+        }
+      }
+      if (!replaced) history.push(data);
+
+      history.sort(function(a, b) { return a.date < b.date ? 1 : -1; });
+      saveHistory(history);
+      renderHistory();
+      showMsg(replaced ? "已更新该日期历史记录。" : "已新增历史记录。");
+    }
+
+    function renderHistory() {
+      var history = loadHistory();
+      var box = document.getElementById("historyList");
+      var sel1 = document.getElementById("compareDate1");
+      var sel2 = document.getElementById("compareDate2");
+
+      sel1.innerHTML = "";
+      sel2.innerHTML = "";
+
+      if (!history.length) {
+        box.innerHTML = "暂无历史记录。先点“保存到历史（按日期）”。";
+        return;
+      }
+
+      var html = ["<div><strong>历史列表</strong></div><div style='margin-top:8px;'>"];
+      for (var i = 0; i < history.length; i++) {
+        var item = history[i];
+        var aW = item.people && item.people.a ? (item.people.a.morningWeight || "-") : "-";
+        var bW = item.people && item.people.b ? (item.people.b.morningWeight || "-") : "-";
+
+        sel1.appendChild(option(item.date));
+        sel2.appendChild(option(item.date));
+
+        html.push(
+          "<div style='padding:8px;border-bottom:1px solid #e5e7eb;'>" +
+          "<div><strong>" + esc(item.date) + "</strong>｜主题：" + esc(item.themeText || "-") + "｜妞妞晨重：" + esc(aW) + "kg｜牛牛晨重：" + esc(bW) + "kg</div>" +
+          "<div style='margin-top:6px;'>" +
+          "<button class='small-btn' type='button' onclick='loadHistoryByDate(\"" + escAttr(item.date) + "\")'>加载这天</button>" +
+          "<button class='small-btn' type='button' onclick='showDetailByDate(\"" + escAttr(item.date) + "\")'>查看详情</button>" +
+          "<button class='small-btn danger' type='button' onclick='deleteHistoryByDate(\"" + escAttr(item.date) + "\")'>删除</button>" +
+          "</div></div>"
+        );
+      }
+      html.push("</div><div id='historyDetail' style='margin-top:10px;white-space:pre-wrap;'></div>");
+      box.innerHTML = html.join("");
+
+      if (history.length >= 2) {
+        sel1.value = history[1].date;
+        sel2.value = history[0].date;
+      } else {
+        sel1.value = history[0].date;
+        sel2.value = history[0].date;
+      }
+    }
+
+    function escAttr(s) {
+      if (s === null || s === undefined) return "";
+      return String(s).replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
+    }
+
+    function option(v) {
+      var op = document.createElement("option");
+      op.value = v;
+      op.textContent = v;
+      return op;
+    }
+
+    function loadHistoryByDate(d) {
+      var history = loadHistory();
+      for (var i = 0; i < history.length; i++) {
+        if (history[i].date === d) {
+          applyAll(history[i]);
+          showMsg("已加载 " + d + " 的记录。");
+          return;
+        }
+      }
+    }
+
+    function deleteHistoryByDate(d) {
+      if (!confirm("确认删除 " + d + " 的历史记录？")) return;
+      var history = loadHistory();
+      var next = [];
+      for (var i = 0; i < history.length; i++) {
+        if (history[i].date !== d) next.push(history[i]);
+      }
+      saveHistory(next);
+      renderHistory();
+      showMsg("已删除 " + d + "。");
+    }
+
+    function detailText(entry) {
+      return buildSummary(entry, "both");
+    }
+
+    function showDetailByDate(d) {
+      var history = loadHistory();
+      for (var i = 0; i < history.length; i++) {
+        if (history[i].date === d) {
+          var detail = document.getElementById("historyDetail");
+          if (detail) detail.textContent = detailText(history[i]);
+          return;
+        }
+      }
+    }
+
+    function parseNum(v) {
+      var n = parseFloat(v);
+      return isNaN(n) ? null : n;
+    }
+
+    function bestPerAction(rowsByType, trainingType) {
+      var rows = rowsByType && rowsByType[trainingType] ? rowsByType[trainingType] : [];
+      var map = {};
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var k = r.action;
+        var w = parseNum(r.actualWeightKg);
+        var rep = parseNum(r.actualRep);
+        if (!map[k]) map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") };
+        else {
+          var oldW = map[k].weight;
+          if (w !== null && (oldW === null || w > oldW)) {
+            map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") };
+          }
+        }
+      }
+      return map;
+    }
+
+    function compareDates() {
+      var person = getVal("comparePerson");
+      var d1 = getVal("compareDate1");
+      var d2 = getVal("compareDate2");
+      var out = document.getElementById("compareResult");
+      var history = loadHistory();
+
+      var a = null, b = null;
+      for (var i = 0; i < history.length; i++) {
+        if (history[i].date === d1) a = history[i];
+        if (history[i].date === d2) b = history[i];
+      }
+      if (!a || !b) {
+        out.textContent = "请选择两个有效日期。";
+        return;
+      }
+
+      var p1 = a.people[person];
+      var p2 = b.people[person];
+      var w1 = parseNum(p1.morningWeight);
+      var w2 = parseNum(p2.morningWeight);
+      var wDelta = (w1 !== null && w2 !== null) ? (w2 - w1).toFixed(1) : "-";
+
+      var m1 = bestPerAction(p1.rowsByType, p1.trainingType);
+      var m2 = bestPerAction(p2.rowsByType, p2.trainingType);
+      var keys = {};
+      var k;
+      for (k in m1) keys[k] = true;
+      for (k in m2) keys[k] = true;
+
+      var html = [];
+      html.push("<div><strong>对比结果（" + (person === "a" ? "妞妞" : "牛牛") + "）</strong></div>");
+      html.push("<div style='margin-top:6px;'>日期A：" + d1 + " ｜ 日期B：" + d2 + "</div>");
+      html.push("<div style='margin-top:6px;'>晨重变化：" + (wDelta === "-" ? "-" : (wDelta > 0 ? "+" + wDelta : wDelta)) + " kg</div>");
+      html.push("<div style='margin-top:8px;' class='scroll'><table><thead><tr><th>动作</th><th>A最好表现</th><th>B最好表现</th><th>重量变化(kg)</th></tr></thead><tbody>");
+
+      for (k in keys) {
+        var x = m1[k] || { text: "-", weight: null };
+        var y = m2[k] || { text: "-", weight: null };
+        var dlt = "-";
+        if (x.weight !== null && y.weight !== null) {
+          var v = (y.weight - x.weight).toFixed(1);
+          dlt = (parseFloat(v) > 0 ? "+" : "") + v;
+        }
+        html.push("<tr><td class='left'>" + esc(k) + "</td><td>" + esc(x.text) + "</td><td>" + esc(y.text) + "</td><td>" + esc(dlt) + "</td></tr>");
+      }
+
+      html.push("</tbody></table></div>");
+      out.innerHTML = html.join("");
+    }
+
+    function buildSummary(data, mode) {
+      var d = data || collectAll();
+      var lines = [];
+      lines.push("翘屁股计划｜" + (d.date || "") + "｜主题：" + (d.themeText || "-"));
+
+      function one(p) {
+        lines.push("");
+        lines.push("【" + p.name + "】训练类型：" + (p.trainingType || "-") + "｜时长：" + (p.duration || "-") + "分钟｜晨重：" + (p.morningWeight || "-") + "kg");
+        lines.push("热身：有氧" + (p.warmup1 || "-") + "分钟；肩胛后缩" + (p.warmup2 || "-") + "；弹力带下拉" + (p.warmup3 || "-"));
+        var rows = p.rowsByType && p.rowsByType[p.trainingType] ? p.rowsByType[p.trainingType] : [];
+        lines.push("力量记录：");
+        for (var i = 0; i < rows.length; i++) {
+          var r = rows[i];
+          var note = r.note ? (" 备注:" + r.note) : "";
+          lines.push("- " + r.action + " 第" + r.set + "组（计划" + r.planWeight + "）=> " + (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") + "，RPE " + (r.rpe || "-") + note);
+        }
+        lines.push("有氧：" + (p.cardio || "-"));
+        lines.push("拉伸：" + (p.stretch || "-"));
+        lines.push("感受：" + (p.feeling || "-"));
+      }
+
+      if (mode === "a") one(d.people.a);
+      else if (mode === "b") one(d.people.b);
+      else {
+        one(d.people.a);
+        one(d.people.b);
+      }
+      return lines.join("\n");
+    }
+
+    function showMsg(msg) {
+      var el = document.getElementById("msg");
+      el.textContent = msg;
+      setTimeout(function() {
+        if (el.textContent === msg) el.textContent = "";
+      }, 2400);
+    }
+
+    function copyText(text, okMsg) {
+      navigator.clipboard.writeText(text).then(function() {
+        showMsg(okMsg);
+      }).catch(function() {
+        showMsg("复制失败，请手动复制。");
+      });
+    }
+
+    function downloadFile(name, content, mime) {
+      var blob = new Blob([content], { type: mime });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function resetPage() {
+      if (!confirm("确认清空当前页面输入？")) return;
+      applyAll({ date: todayStr(), themeSelect: "减脂塑形周", customTheme: "", people: {} });
+      showMsg("已清空页面。");
+    }
+
+    function toggleCustomTheme() {
+      var wrap = document.getElementById("customThemeWrap");
+      wrap.style.display = getVal("sessionTheme") === "自定义" ? "block" : "none";
+    }
+
+    function init() {
+      setVal("trainDate", todayStr());
+
+      document.getElementById("tab-a").addEventListener("click", function(){ setActivePerson("a"); });
+      document.getElementById("tab-b").addEventListener("click", function(){ setActivePerson("b"); });
+      document.getElementById("sessionTheme").addEventListener("change", toggleCustomTheme);
+
+      document.getElementById("saveDraftBtn").addEventListener("click", saveDraft);
+      document.getElementById("saveHistoryBtn").addEventListener("click", saveToHistory);
+      document.getElementById("copyBothBtn").addEventListener("click", function(){ copyText(buildSummary(collectAll(), "both"), "已复制双人汇总。"); });
+
+      document.getElementById("downloadTxtBtn").addEventListener("click", function(){
+        var d = collectAll();
+        downloadFile("qiaopigu-" + (d.date || todayStr()) + ".txt", buildSummary(d, "both"), "text/plain;charset=utf-8");
+        showMsg("已下载 TXT。");
+      });
+
+      document.getElementById("downloadJsonBtn").addEventListener("click", function(){
+        var d = collectAll();
+        downloadFile("qiaopigu-" + (d.date || todayStr()) + ".json", JSON.stringify(d, null, 2), "application/json");
+        showMsg("已下载 JSON。");
+      });
+
+      document.getElementById("resetBtn").addEventListener("click", resetPage);
+      document.getElementById("compareBtn").addEventListener("click", compareDates);
+      document.getElementById("refreshHistoryBtn").addEventListener("click", renderHistory);
+
+      applyAll({ date: todayStr(), themeSelect: "减脂塑形周", customTheme: "", people: {} });
+      loadDraft();
+      renderHistory();
+    }
+
+    init();
+  </script>
+</body>
+</html>
