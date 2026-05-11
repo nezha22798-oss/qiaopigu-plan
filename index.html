@@ -6,45 +6,130 @@
   <title>翘屁股计划</title>
   <style>
     :root {
-      --bg: #f6f8fc;
+      --bg: #f2fbf6;
       --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #d1d5db;
-      --primary: #0f766e;
-      --primary2: #0d9488;
+      --text: #1d2a21;
+      --muted: #4b6356;
+      --line: #cfe8db;
+      --primary: #17b06c;
+      --primary2: #10965b;
+      --accent: #22d3ee;
+      --accent2: #60a5fa;
       --danger: #b91c1c;
+      --ok: #065f46;
     }
+
     * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: "PingFang SC", "Noto Sans SC", "Helvetica Neue", Arial, sans-serif;
       color: var(--text);
-      background: linear-gradient(180deg, #eef6ff 0%, var(--bg) 45%);
+      background:
+        radial-gradient(900px 420px at 100% -20%, rgba(34, 197, 94, 0.2), transparent 60%),
+        radial-gradient(760px 420px at 0% 0%, rgba(16, 185, 129, 0.16), transparent 62%),
+        linear-gradient(180deg, #edf9f1 0%, var(--bg) 42%);
+      padding-bottom: 92px;
     }
-    .wrap { max-width: 1020px; margin: 0 auto; padding: 14px; }
+
+    .wrap { max-width: 980px; margin: 0 auto; padding: 14px; }
+
     .card {
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 14px;
       padding: 14px;
       margin-bottom: 12px;
-      box-shadow: 0 4px 14px rgba(17,24,39,.06);
+      box-shadow: 0 8px 22px rgba(22, 101, 52, 0.09);
     }
-    .person-card { display: none; border-left: 5px solid #14b8a6; }
-    .person-card.active { display: block; }
 
     h1 { margin: 0 0 6px; font-size: 24px; }
     h2 { margin: 0 0 10px; font-size: 16px; }
-    h3 { margin: 0 0 10px; font-size: 18px; color: #0f766e; }
     .muted { color: var(--muted); font-size: 13px; }
+    #view-home .card { background: linear-gradient(180deg, #ffffff 0%, #f7fdf9 100%); }
+
+    .hero-banner {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      padding: 18px;
+      background:
+        linear-gradient(145deg, rgba(29, 191, 115, 0.96) 0%, rgba(23, 176, 108, 0.92) 50%, rgba(11, 163, 95, 0.9) 100%);
+      color: #fff;
+      box-shadow: 0 18px 36px rgba(11, 163, 95, 0.28);
+    }
+    .hero-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(260px 140px at 88% 8%, rgba(255, 255, 255, 0.28), transparent 74%),
+        radial-gradient(220px 120px at 8% 92%, rgba(253, 224, 71, 0.18), transparent 74%);
+      pointer-events: none;
+    }
+    .hero-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+      align-items: center;
+      z-index: 1;
+    }
+    .hero-banner h1 {
+      margin: 0;
+      font-size: 32px;
+      letter-spacing: 1px;
+      line-height: 1.12;
+      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    .hero-subline {
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: 0.96;
+      letter-spacing: 0.2px;
+    }
+    .hero-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.42);
+      background: rgba(255, 255, 255, 0.18);
+      font-size: 12px;
+      font-weight: 700;
+      backdrop-filter: blur(8px);
+    }
+    .hero-art {
+      min-height: 134px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0.1)),
+        rgba(8, 122, 72, 0.2);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+    .hero-art svg {
+      width: 92%;
+      height: auto;
+      max-height: 118px;
+    }
 
     .grid { display: grid; gap: 10px; }
     .grid-2 { grid-template-columns: 1fr 1fr; }
     .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
 
-    label { display: block; font-size: 13px; margin-bottom: 5px; color: #374151; }
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #374151;
+    }
+
     input, select, textarea, button {
       width: 100%;
       border: 1px solid var(--line);
@@ -54,25 +139,97 @@
       background: #fff;
       color: #111827;
     }
+
     textarea { min-height: 82px; resize: vertical; }
 
-    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .tab-btn {
-      border: 1px solid var(--line);
-      background: #f3f4f6;
-      color: #111827;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 10px;
+    .btn {
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      background: var(--primary);
       cursor: pointer;
     }
-    .tab-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
-
-    .btn { border: none; color: #fff; font-weight: 600; background: var(--primary); cursor: pointer; }
     .btn-secondary { background: var(--primary2); }
     .btn-danger { background: var(--danger); }
 
-    .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .person-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .person-btn {
+      border: 1px solid var(--line);
+      background: #f2fbf6;
+      font-weight: 700;
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .person-btn.active {
+      background: linear-gradient(180deg, #18b56f 0%, #129a5d 100%);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .person-card-home {
+      text-align: left;
+      padding: 18px 16px;
+      min-height: 132px;
+      background: linear-gradient(180deg, #ffffff 0%, #f1fbf5 100%);
+      box-shadow: 0 10px 22px rgba(21, 128, 61, 0.12);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    .person-card-home:active {
+      transform: scale(0.985);
+    }
+    .person-card-home.active {
+      background: linear-gradient(180deg, #18b56f 0%, #10965b 100%);
+      box-shadow: 0 14px 28px rgba(16, 150, 91, 0.3);
+    }
+    .person-name {
+      font-size: 21px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      letter-spacing: 0.3px;
+    }
+    .person-meta {
+      font-size: 13px;
+      opacity: 0.92;
+      line-height: 1.45;
+    }
+
+    .badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+    .badge-ok { background: #dcfce7; color: #14532d; }
+    .badge-no { background: #fee2e2; color: #7f1d1d; }
+
+    .view { display: none; }
+    .view.active { display: block; }
+
+    .top-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .current-person {
+      font-size: 14px;
+      color: #0f8a52;
+      font-weight: 700;
+    }
+
+    .scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
     table {
       border-collapse: collapse;
       min-width: 900px;
@@ -91,14 +248,21 @@
     td .narrow { min-width: 56px; }
     .left { text-align: left; }
 
-    .ok { color: #065f46; font-size: 13px; margin-top: 8px; min-height: 18px; }
+    .ok {
+      color: var(--ok);
+      font-size: 13px;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
     .history-box {
-      border: 1px dashed #94a3b8;
+      border: 1px dashed #8ec5a9;
       border-radius: 10px;
       padding: 10px;
       margin-top: 10px;
-      background: #f8fafc;
+      background: #f5fcf8;
     }
+
     .small-btn {
       width: auto;
       padding: 6px 10px;
@@ -108,173 +272,273 @@
       border: 0;
       color: #fff;
       cursor: pointer;
-      background: #0f766e;
+      background: #129a5d;
     }
-    .small-btn.danger { background: #b91c1c; }
+    .small-btn.danger { background: var(--danger); }
 
-    @media (max-width: 900px) {
-      .grid-4 { grid-template-columns: 1fr 1fr; }
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 76px;
+      background: rgba(255, 255, 255, 0.96);
+      border-top: 1px solid #e5e7eb;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      z-index: 999;
+      backdrop-filter: saturate(180%) blur(8px);
     }
+    .nav-btn {
+      border: 0;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: #4b5563;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .nav-btn .icon {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .nav-btn.active {
+      color: #10965b;
+      font-weight: 700;
+    }
+
     @media (max-width: 720px) {
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
       h1 { font-size: 21px; }
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-banner h1 { font-size: 28px; }
+      .hero-art { min-height: 110px; }
+      .person-card-home { min-height: 124px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <div class="card">
-      <h1>翘屁股计划</h1>
-      <div class="muted">A=妞妞，B=牛牛。支持训练类型联动动作表、按日期历史记录、日期对比分析。</div>
+      <div class="hero-banner">
+        <div class="hero-inner">
+          <div>
+            <h1>翘屁股计划</h1>
+            <div class="hero-subline">训练打卡 · 双人记录 · 进度对比</div>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/>
+                  <stop offset="100%" stop-color="rgba(220,252,231,0.78)"/>
+                </linearGradient>
+              </defs>
+              <rect x="12" y="46" width="296" height="94" rx="24" fill="rgba(6,95,70,0.24)"/>
+              <rect x="22" y="58" width="276" height="72" rx="16" fill="url(#panel)"/>
+              <rect x="34" y="106" width="252" height="12" rx="6" fill="rgba(16,185,129,0.2)"/>
+
+              <circle cx="88" cy="74" r="10" fill="rgba(15,118,110,0.92)"/>
+              <path d="M88 84 L88 103" stroke="rgba(15,118,110,0.92)" stroke-width="7" stroke-linecap="round"/>
+              <path d="M88 90 L68 98" stroke="rgba(15,118,110,0.92)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M88 90 L108 98" stroke="rgba(15,118,110,0.92)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M88 103 L76 121" stroke="rgba(15,118,110,0.92)" stroke-width="6" stroke-linecap="round"/>
+              <path d="M88 103 L102 121" stroke="rgba(15,118,110,0.92)" stroke-width="6" stroke-linecap="round"/>
+
+              <rect x="114" y="68" width="84" height="10" rx="5" fill="rgba(16,185,129,0.95)"/>
+              <rect x="104" y="64" width="10" height="18" rx="3" fill="rgba(5,150,105,0.95)"/>
+              <rect x="198" y="64" width="10" height="18" rx="3" fill="rgba(5,150,105,0.95)"/>
+
+              <rect x="224" y="70" width="50" height="8" rx="4" fill="rgba(15,118,110,0.86)"/>
+              <rect x="216" y="66" width="8" height="16" rx="2" fill="rgba(15,118,110,0.86)"/>
+              <rect x="274" y="66" width="8" height="16" rx="2" fill="rgba(15,118,110,0.86)"/>
+              <rect x="210" y="62" width="6" height="24" rx="2" fill="rgba(13,148,136,0.92)"/>
+              <rect x="282" y="62" width="6" height="24" rx="2" fill="rgba(13,148,136,0.92)"/>
+
+              <circle cx="252" cy="38" r="18" fill="rgba(253,224,71,0.92)"/>
+              <path d="M242 38h20" stroke="rgba(22,101,52,0.86)" stroke-width="5" stroke-linecap="round"/>
+              <path d="M252 28v20" stroke="rgba(22,101,52,0.86)" stroke-width="5" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
-      <h2>全局信息</h2>
-      <div class="grid grid-3">
-        <div>
-          <label for="trainDate">日期</label>
-          <input id="trainDate" type="date">
+    <div id="view-home" class="view active">
+      <div class="card">
+        <h2>首页打卡</h2>
+        <div class="grid grid-3">
+          <div>
+            <label for="trainDate">日期</label>
+            <input id="trainDate" type="date">
+          </div>
+          <div>
+            <label for="sessionTheme">训练主题</label>
+            <select id="sessionTheme">
+              <option value="减脂塑形周">减脂塑形周</option>
+              <option value="翘臀强化周">翘臀强化周</option>
+              <option value="恢复减量周">恢复减量周</option>
+              <option value="自定义">自定义</option>
+            </select>
+          </div>
+          <div id="customThemeWrap" style="display:none;">
+            <label for="customTheme">自定义主题</label>
+            <input id="customTheme" type="text" placeholder="例如：第3周冲刺">
+          </div>
         </div>
-        <div>
-          <label for="sessionTheme">训练主题</label>
-          <select id="sessionTheme">
-            <option value="减脂塑形周">减脂塑形周</option>
-            <option value="翘臀强化周">翘臀强化周</option>
-            <option value="恢复减量周">恢复减量周</option>
-            <option value="自定义">自定义</option>
-          </select>
+      </div>
+
+      <div class="card">
+        <h2>切换训练者</h2>
+        <div class="person-switch">
+          <button id="home-person-a" class="person-btn person-card-home active" type="button">
+            <div class="person-name">妞妞</div>
+            <div id="home-status-a" class="person-meta">今日未打卡</div>
+          </button>
+          <button id="home-person-b" class="person-btn person-card-home" type="button">
+            <div class="person-name">牛牛</div>
+            <div id="home-status-b" class="person-meta">今日未打卡</div>
+          </button>
         </div>
-        <div id="customThemeWrap" style="display:none;">
-          <label for="customTheme">自定义主题</label>
-          <input id="customTheme" type="text" placeholder="例如：第3周冲刺">
+        <div style="margin-top:10px;" id="home-summary" class="muted"></div>
+        <div style="margin-top:12px;" class="grid grid-2">
+          <button class="btn" id="gotoRecordBtn" type="button">开始记录</button>
         </div>
       </div>
     </div>
 
-    <div class="card">
-      <h2>切换训练者</h2>
-      <div class="tabs">
-        <button id="tab-a" class="tab-btn active" type="button">A｜妞妞</button>
-        <button id="tab-b" class="tab-btn" type="button">B｜牛牛</button>
+    <div id="view-record" class="view">
+      <div class="card">
+        <div class="top-row">
+          <h2 style="margin:0;">训练记录</h2>
+          <div class="current-person" id="currentPersonLabel">当前：妞妞</div>
+        </div>
+        <div class="grid grid-3" style="margin-top:10px;">
+          <div>
+            <label for="recordPersonSelect">姓名</label>
+            <select id="recordPersonSelect">
+              <option value="a">妞妞</option>
+              <option value="b">牛牛</option>
+            </select>
+          </div>
+          <div>
+            <label for="recordTrainingType">训练类型</label>
+            <select id="recordTrainingType">
+              <option value="上肢B（拉）">上肢B（拉）</option>
+              <option value="上肢A（推）">上肢A（推）</option>
+              <option value="腿1（臀主导）">腿1（臀主导）</option>
+              <option value="腿2（臀腿）">腿2（臀腿）</option>
+              <option value="有氧+核心">有氧+核心</option>
+            </select>
+          </div>
+          <div>
+            <label for="recordDuration">训练时长（分钟）</label>
+            <select id="recordDuration">
+              <option value="">请选择</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="45">45</option>
+              <option value="50">50</option>
+              <option value="60">60</option>
+              <option value="75">75</option>
+              <option value="90">90</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-3" style="margin-top:10px;">
+          <div><label for="recordMorningWeight">空腹体重（kg）</label><input id="recordMorningWeight" type="number" step="0.1"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>力量记录（随训练类型变化）</h2>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>动作（可编辑）</th><th>组次（可编辑）</th><th>目标次数/时长（可编辑）</th><th>计划重量<br>kg(lb)（可编辑）</th>
+                <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
+              </tr>
+            </thead>
+            <tbody id="recordRows"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>补充记录</h2>
+        <div class="grid grid-2">
+          <div><label for="recordCardio">有氧记录</label><textarea id="recordCardio"></textarea></div>
+        </div>
+        <div style="margin-top:10px;"><label for="recordFeeling">主观感受</label><textarea id="recordFeeling"></textarea></div>
+        <div style="margin-top:10px;" class="grid grid-3">
+          <button class="btn btn-secondary" id="saveHistoryBtn" type="button">保存记录（加入对比）</button>
+          <button class="btn btn-secondary" id="copyCurrentBtn" type="button">复制当前训练者记录</button>
+        </div>
+        <div id="recordMsg" class="ok"></div>
       </div>
     </div>
 
-    <div id="person-card-a" class="card person-card active">
-      <h3>训练者A（妞妞）</h3>
-      <div class="grid grid-4">
-        <div><label>姓名</label><input id="name-a" type="text" value="妞妞" readonly></div>
-        <div>
-          <label for="type-a">训练类型</label>
-          <select id="type-a" onchange="onTrainingTypeChange('a')">
-            <option value="上肢B（拉）">上肢B（拉）</option>
-            <option value="上肢A（推）">上肢A（推）</option>
-            <option value="腿1（臀主导）">腿1（臀主导）</option>
-            <option value="腿2（臀腿）">腿2（臀腿）</option>
-            <option value="有氧+核心">有氧+核心</option>
-          </select>
+    <div id="view-history" class="view">
+      <div class="card">
+        <h2>历史记录与对比</h2>
+        <div class="grid grid-3">
+          <button class="btn btn-secondary" id="copyBothBtn" type="button">复制双人汇总文本</button>
+          <button class="btn btn-secondary" id="downloadTxtBtn" type="button">下载双人 TXT</button>
+          <button class="btn btn-secondary" id="downloadJsonBtn" type="button">下载全部 JSON（含历史）</button>
+          <button class="btn btn-secondary" id="importJsonBtn" type="button">导入 JSON 恢复记录</button>
+          <button class="btn btn-secondary" id="refreshHistoryBtn" type="button">刷新历史列表</button>
+          <button class="btn btn-danger" id="resetBtn" type="button">清空当前页</button>
         </div>
-        <div><label for="duration-a">训练时长（分钟）</label><input id="duration-a" type="number"></div>
-        <div><label for="morningWeight-a">早晨体重（kg）</label><input id="morningWeight-a" type="number" step="0.1"></div>
+        <input id="importJsonInput" type="file" accept=".json,application/json" style="display:none;">
+        <div id="msg" class="ok"></div>
       </div>
-      <h2 style="margin-top:12px;">热身</h2>
-      <div class="grid grid-3">
-        <div><label for="warm1-a">快走/椭圆机（分钟）</label><input id="warm1-a" type="number"></div>
-        <div><label for="warm2-a">弹力带肩胛后缩（组×次）</label><input id="warm2-a" type="text"></div>
-        <div><label for="warm3-a">弹力带下拉（组×次）</label><input id="warm3-a" type="text"></div>
-      </div>
-      <h2 style="margin-top:12px;">力量记录（随训练类型变化）</h2>
-      <div class="scroll"><table><thead><tr>
-        <th>动作</th><th>组次</th><th>目标次数/时长</th><th>计划重量<br>kg(lb)</th>
-        <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
-      </tr></thead><tbody id="tbody-a"></tbody></table></div>
-      <h2 style="margin-top:12px;">有氧与拉伸</h2>
-      <div class="grid grid-2">
-        <div><label for="cardio-a">有氧记录</label><textarea id="cardio-a"></textarea></div>
-        <div><label for="stretch-a">拉伸记录</label><textarea id="stretch-a"></textarea></div>
-      </div>
-      <div style="margin-top:10px;"><label for="feeling-a">主观感受</label><textarea id="feeling-a"></textarea></div>
-    </div>
 
-    <div id="person-card-b" class="card person-card">
-      <h3>训练者B（牛牛）</h3>
-      <div class="grid grid-4">
-        <div><label>姓名</label><input id="name-b" type="text" value="牛牛" readonly></div>
-        <div>
-          <label for="type-b">训练类型</label>
-          <select id="type-b" onchange="onTrainingTypeChange('b')">
-            <option value="上肢B（拉）">上肢B（拉）</option>
-            <option value="上肢A（推）">上肢A（推）</option>
-            <option value="腿1（臀主导）">腿1（臀主导）</option>
-            <option value="腿2（臀腿）">腿2（臀腿）</option>
-            <option value="有氧+核心">有氧+核心</option>
-          </select>
+      <div class="card">
+        <div class="grid grid-3">
+          <div>
+            <label for="comparePerson">对比对象</label>
+            <select id="comparePerson">
+              <option value="a">妞妞</option>
+              <option value="b">牛牛</option>
+            </select>
+          </div>
+          <div>
+            <label for="compareDate1">日期A</label>
+            <select id="compareDate1"></select>
+          </div>
+          <div>
+            <label for="compareDate2">日期B</label>
+            <select id="compareDate2"></select>
+          </div>
         </div>
-        <div><label for="duration-b">训练时长（分钟）</label><input id="duration-b" type="number"></div>
-        <div><label for="morningWeight-b">早晨体重（kg）</label><input id="morningWeight-b" type="number" step="0.1"></div>
-      </div>
-      <h2 style="margin-top:12px;">热身</h2>
-      <div class="grid grid-3">
-        <div><label for="warm1-b">快走/椭圆机（分钟）</label><input id="warm1-b" type="number"></div>
-        <div><label for="warm2-b">弹力带肩胛后缩（组×次）</label><input id="warm2-b" type="text"></div>
-        <div><label for="warm3-b">弹力带下拉（组×次）</label><input id="warm3-b" type="text"></div>
-      </div>
-      <h2 style="margin-top:12px;">力量记录（随训练类型变化）</h2>
-      <div class="scroll"><table><thead><tr>
-        <th>动作</th><th>组次</th><th>目标次数/时长</th><th>计划重量<br>kg(lb)</th>
-        <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
-      </tr></thead><tbody id="tbody-b"></tbody></table></div>
-      <h2 style="margin-top:12px;">有氧与拉伸</h2>
-      <div class="grid grid-2">
-        <div><label for="cardio-b">有氧记录</label><textarea id="cardio-b"></textarea></div>
-        <div><label for="stretch-b">拉伸记录</label><textarea id="stretch-b"></textarea></div>
-      </div>
-      <div style="margin-top:10px;"><label for="feeling-b">主观感受</label><textarea id="feeling-b"></textarea></div>
-    </div>
-
-    <div class="card">
-      <div class="grid grid-3">
-        <button class="btn" id="saveDraftBtn" type="button">保存草稿</button>
-        <button class="btn btn-secondary" id="saveHistoryBtn" type="button">保存到历史（按日期）</button>
-        <button class="btn btn-secondary" id="copyBothBtn" type="button">复制双人汇总文本</button>
-        <button class="btn btn-secondary" id="downloadTxtBtn" type="button">下载双人 TXT</button>
-        <button class="btn btn-secondary" id="downloadJsonBtn" type="button">下载双人 JSON</button>
-        <button class="btn btn-danger" id="resetBtn" type="button">清空当前页</button>
-      </div>
-      <div id="msg" class="ok"></div>
-    </div>
-
-    <div class="card">
-      <h2>历史记录与日期对比</h2>
-      <div class="grid grid-3">
-        <div>
-          <label for="comparePerson">对比对象</label>
-          <select id="comparePerson">
-            <option value="a">妞妞</option>
-            <option value="b">牛牛</option>
-          </select>
+        <div style="margin-top:10px;" class="grid grid-2">
+          <button class="btn btn-secondary" id="compareBtn" type="button">生成日期对比</button>
         </div>
-        <div>
-          <label for="compareDate1">日期A</label>
-          <select id="compareDate1"></select>
-        </div>
-        <div>
-          <label for="compareDate2">日期B</label>
-          <select id="compareDate2"></select>
-        </div>
+        <div id="compareResult" class="history-box"></div>
+        <div id="historyList" class="history-box"></div>
       </div>
-      <div style="margin-top:10px;" class="grid grid-2">
-        <button class="btn btn-secondary" id="compareBtn" type="button">生成日期对比</button>
-        <button class="btn btn-secondary" id="refreshHistoryBtn" type="button">刷新历史列表</button>
-      </div>
-      <div id="compareResult" class="history-box"></div>
-      <div id="historyList" class="history-box"></div>
     </div>
   </div>
 
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-view="home" type="button"><span class="icon">⌂</span><span>首页</span></button>
+    <button class="nav-btn" data-view="record" type="button"><span class="icon">✎</span><span>记录</span></button>
+    <button class="nav-btn" data-view="history" type="button"><span class="icon">◷</span><span>对比</span></button>
+  </nav>
+
   <script>
-    var DRAFT_KEY = "qiaopigu_plan_draft_v1";
-    var HISTORY_KEY = "qiaopigu_plan_history_v1";
+    var DRAFT_KEY = "qiaopigu_plan_draft_v2";
+    var HISTORY_KEY = "qiaopigu_plan_history_v2";
+    var memoryStore = { draft: null, history: [] };
+    var localStorageOK = true;
+
+    var activeView = "home";
     var activePersonId = "a";
+    var autoSaveTimer = null;
 
     var templates = {
       "上肢B（拉）": [
@@ -309,10 +573,27 @@
       ]
     };
 
-    var state = {
-      a: { currentType: "上肢B（拉）", rowsByType: {} },
-      b: { currentType: "上肢B（拉）", rowsByType: {} }
+    var app = {
+      date: "",
+      themeSelect: "减脂塑形周",
+      customTheme: "",
+      people: {
+        a: defaultPerson("妞妞"),
+        b: defaultPerson("牛牛")
+      }
     };
+
+    function defaultPerson(name) {
+      return {
+        name: name,
+        trainingType: "上肢B（拉）",
+        duration: "",
+        morningWeight: "",
+        rowsByType: {},
+        cardio: "",
+        feeling: ""
+      };
+    }
 
     function todayStr() {
       var d = new Date();
@@ -322,172 +603,34 @@
       return y + "-" + m + "-" + day;
     }
 
-    function setActivePerson(pid) {
-      activePersonId = pid;
-      var cardA = document.getElementById("person-card-a");
-      var cardB = document.getElementById("person-card-b");
-      var tabA = document.getElementById("tab-a");
-      var tabB = document.getElementById("tab-b");
-      if (pid === "a") {
-        cardA.classList.add("active"); cardB.classList.remove("active");
-        tabA.classList.add("active"); tabB.classList.remove("active");
-      } else {
-        cardB.classList.add("active"); cardA.classList.remove("active");
-        tabB.classList.add("active"); tabA.classList.remove("active");
-      }
-    }
-
-    function rowInputId(pid, idx, key) {
-      return "r-" + pid + "-" + idx + "-" + key;
-    }
-
-    function buildRows(pid, typeName, preloadRows) {
-      var tbody = document.getElementById("tbody-" + pid);
-      var tpl = templates[typeName] || [];
-      tbody.innerHTML = "";
-
-      for (var i = 0; i < tpl.length; i++) {
-        var r = tpl[i];
-        var saved = preloadRows && preloadRows[i] ? preloadRows[i] : null;
-        var tr = document.createElement("tr");
-        tr.innerHTML =
-          "<td class='left'>" + r[0] + "</td>" +
-          "<td>" + r[1] + "</td>" +
-          "<td>" + r[2] + "</td>" +
-          "<td>" + r[3] + "</td>" +
-          "<td><input id='" + rowInputId(pid, i, "w") + "' class='narrow' inputmode='decimal' value='" + esc(saved ? saved.actualWeightKg : "") + "'></td>" +
-          "<td><input id='" + rowInputId(pid, i, "rep") + "' class='narrow' value='" + esc(saved ? saved.actualRep : "") + "'></td>" +
-          "<td><input id='" + rowInputId(pid, i, "rpe") + "' class='narrow' inputmode='decimal' value='" + esc(saved ? saved.rpe : "") + "'></td>" +
-          "<td><input id='" + rowInputId(pid, i, "note") + "' value='" + esc(saved ? saved.note : "") + "'></td>";
-        tbody.appendChild(tr);
-      }
-    }
-
     function esc(s) {
       if (s === null || s === undefined) return "";
-      return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    function getCurrentRows(pid, typeName) {
-      var tpl = templates[typeName] || [];
-      var rows = [];
-      for (var i = 0; i < tpl.length; i++) {
-        rows.push({
-          action: tpl[i][0],
-          set: tpl[i][1],
-          targetRep: tpl[i][2],
-          planWeight: tpl[i][3],
-          actualWeightKg: getVal(rowInputId(pid, i, "w")),
-          actualRep: getVal(rowInputId(pid, i, "rep")),
-          rpe: getVal(rowInputId(pid, i, "rpe")),
-          note: getVal(rowInputId(pid, i, "note"))
-        });
+    function getHistory() {
+      if (!localStorageOK) return Array.isArray(memoryStore.history) ? memoryStore.history : [];
+      try {
+        var raw = localStorage.getItem(HISTORY_KEY);
+        if (!raw) return [];
+        var arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) {
+        return Array.isArray(memoryStore.history) ? memoryStore.history : [];
       }
-      return rows;
     }
 
-    function onTrainingTypeChange(pid) {
-      var typeEl = document.getElementById("type-" + pid);
-      var newType = typeEl.value;
-      var oldType = state[pid].currentType;
-
-      state[pid].rowsByType[oldType] = getCurrentRows(pid, oldType);
-      state[pid].currentType = newType;
-
-      var preload = state[pid].rowsByType[newType] || null;
-      buildRows(pid, newType, preload);
-    }
-
-    function getVal(id) {
-      var el = document.getElementById(id);
-      return el ? el.value.trim() : "";
-    }
-
-    function setVal(id, v) {
-      var el = document.getElementById(id);
-      if (el) el.value = v || "";
-    }
-
-    function collectPerson(pid) {
-      var typeName = getVal("type-" + pid) || "上肢B（拉）";
-      state[pid].rowsByType[typeName] = getCurrentRows(pid, typeName);
-
-      return {
-        id: pid,
-        name: getVal("name-" + pid),
-        trainingType: typeName,
-        duration: getVal("duration-" + pid),
-        morningWeight: getVal("morningWeight-" + pid),
-        warmup1: getVal("warm1-" + pid),
-        warmup2: getVal("warm2-" + pid),
-        warmup3: getVal("warm3-" + pid),
-        rowsByType: state[pid].rowsByType,
-        cardio: getVal("cardio-" + pid),
-        stretch: getVal("stretch-" + pid),
-        feeling: getVal("feeling-" + pid)
-      };
-    }
-
-    function getThemeText() {
-      var theme = getVal("sessionTheme");
-      if (theme === "自定义") {
-        var custom = getVal("customTheme");
-        return custom || "自定义";
-      }
-      return theme;
-    }
-
-    function collectAll() {
-      return {
-        date: getVal("trainDate") || todayStr(),
-        themeSelect: getVal("sessionTheme"),
-        customTheme: getVal("customTheme"),
-        themeText: getThemeText(),
-        activePersonId: activePersonId,
-        people: {
-          a: collectPerson("a"),
-          b: collectPerson("b")
-        }
-      };
-    }
-
-    function applyPerson(pid, p) {
-      p = p || {};
-      setVal("name-" + pid, p.name || (pid === "a" ? "妞妞" : "牛牛"));
-      setVal("type-" + pid, p.trainingType || "上肢B（拉）");
-      setVal("duration-" + pid, p.duration || "");
-      setVal("morningWeight-" + pid, p.morningWeight || "");
-      setVal("warm1-" + pid, p.warmup1 || "");
-      setVal("warm2-" + pid, p.warmup2 || "");
-      setVal("warm3-" + pid, p.warmup3 || "");
-      setVal("cardio-" + pid, p.cardio || "");
-      setVal("stretch-" + pid, p.stretch || "");
-      setVal("feeling-" + pid, p.feeling || "");
-
-      state[pid].rowsByType = p.rowsByType || {};
-      state[pid].currentType = getVal("type-" + pid) || "上肢B（拉）";
-      var preload = state[pid].rowsByType[state[pid].currentType] || null;
-      buildRows(pid, state[pid].currentType, preload);
-    }
-
-    function applyAll(data) {
-      data = data || {};
-      setVal("trainDate", data.date || todayStr());
-      setVal("sessionTheme", data.themeSelect || "减脂塑形周");
-      setVal("customTheme", data.customTheme || "");
-      toggleCustomTheme();
-
-      var pa = data.people && data.people.a ? data.people.a : null;
-      var pb = data.people && data.people.b ? data.people.b : null;
-      applyPerson("a", pa);
-      applyPerson("b", pb);
-      setActivePerson(data.activePersonId === "b" ? "b" : "a");
+    function saveHistory(list) {
+      memoryStore.history = Array.isArray(list) ? list : [];
+      if (!localStorageOK) return;
+      try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) {}
     }
 
     function saveDraft() {
-      var data = collectAll();
+      syncRecordFormToState();
+      memoryStore.draft = { app: app, activePersonId: activePersonId };
       try {
-        localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+        if (localStorageOK) localStorage.setItem(DRAFT_KEY, JSON.stringify({ app: app, activePersonId: activePersonId }));
         showMsg("已保存草稿。");
       } catch (e) {
         showMsg("草稿保存失败（浏览器限制）。");
@@ -495,68 +638,222 @@
     }
 
     function loadDraft() {
-      var raw = null;
-      try { raw = localStorage.getItem(DRAFT_KEY); } catch (e) { raw = null; }
-      if (!raw) return false;
-      try {
-        applyAll(JSON.parse(raw));
+      if (!localStorageOK && memoryStore.draft && memoryStore.draft.app) {
+        app = memoryStore.draft.app;
+        activePersonId = memoryStore.draft.activePersonId === "b" ? "b" : "a";
         return true;
-      } catch (e) {
-        return false;
+      }
+      try {
+        var raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return false;
+        var d = JSON.parse(raw);
+        if (d && d.app) {
+          app = d.app;
+          activePersonId = d.activePersonId === "b" ? "b" : "a";
+          return true;
+        }
+      } catch (e) {}
+      return false;
+    }
+
+    function setView(v) {
+      if (activeView === "record") syncRecordFormToState();
+      activeView = v;
+      var views = ["home", "record", "history"];
+      for (var i = 0; i < views.length; i++) {
+        var id = views[i];
+        var el = document.getElementById("view-" + id);
+        if (el) el.classList.toggle("active", id === v);
+      }
+      var navs = document.querySelectorAll(".nav-btn");
+      for (i = 0; i < navs.length; i++) {
+        navs[i].classList.toggle("active", navs[i].getAttribute("data-view") === v);
+      }
+      if (v === "record") renderRecordView();
+      if (v === "home") renderHomeStatus();
+      if (v === "history") renderHistory();
+    }
+
+    function setActivePerson(pid) {
+      if (activeView === "record") syncRecordFormToState();
+      activePersonId = pid === "b" ? "b" : "a";
+      document.getElementById("home-person-a").classList.toggle("active", activePersonId === "a");
+      document.getElementById("home-person-b").classList.toggle("active", activePersonId === "b");
+      renderHomeStatus();
+      if (activeView === "record") renderRecordView();
+    }
+
+    function toggleCustomTheme() {
+      var wrap = document.getElementById("customThemeWrap");
+      wrap.style.display = document.getElementById("sessionTheme").value === "自定义" ? "block" : "none";
+    }
+
+    function buildRecordRows(person, preloadRows) {
+      var tbody = document.getElementById("recordRows");
+      var tpl = templates[person.trainingType] || [];
+      tbody.innerHTML = "";
+      for (var i = 0; i < tpl.length; i++) {
+        var t = tpl[i];
+        var s = preloadRows && preloadRows[i] ? preloadRows[i] : null;
+        var actionVal = (s && s.action !== undefined && s.action !== null && s.action !== "") ? s.action : t[0];
+        var setVal = (s && s.set !== undefined && s.set !== null && s.set !== "") ? s.set : t[1];
+        var targetVal = (s && s.targetRep !== undefined && s.targetRep !== null && s.targetRep !== "") ? s.targetRep : t[2];
+        var planVal = (s && s.planWeight !== undefined && s.planWeight !== null && s.planWeight !== "") ? s.planWeight : t[3];
+        var tr = document.createElement("tr");
+        tr.innerHTML =
+          "<td><input id='row-a-" + i + "' value='" + esc(actionVal) + "'></td>" +
+          "<td><input id='row-s-" + i + "' class='narrow' value='" + esc(setVal) + "'></td>" +
+          "<td><input id='row-t-" + i + "' class='narrow' value='" + esc(targetVal) + "'></td>" +
+          "<td><input id='row-pl-" + i + "' class='narrow' value='" + esc(planVal) + "'></td>" +
+          "<td><input id='row-w-" + i + "' class='narrow' inputmode='decimal' value='" + esc(s ? s.actualWeightKg : "") + "'></td>" +
+          "<td><input id='row-r-" + i + "' class='narrow' value='" + esc(s ? s.actualRep : "") + "'></td>" +
+          "<td><input id='row-p-" + i + "' class='narrow' inputmode='decimal' value='" + esc(s ? s.rpe : "") + "'></td>" +
+          "<td><input id='row-n-" + i + "' value='" + esc(s ? s.note : "") + "'></td>";
+        tbody.appendChild(tr);
       }
     }
 
-    function loadHistory() {
-      var raw = null;
-      try { raw = localStorage.getItem(HISTORY_KEY); } catch (e) { raw = null; }
-      if (!raw) return [];
-      try {
-        var arr = JSON.parse(raw);
-        return Array.isArray(arr) ? arr : [];
-      } catch (e) {
-        return [];
+    function collectRowsForPerson(person) {
+      var tpl = templates[person.trainingType] || [];
+      var rows = [];
+      for (var i = 0; i < tpl.length; i++) {
+        rows.push({
+          action: val("row-a-" + i) || tpl[i][0],
+          set: val("row-s-" + i) || tpl[i][1],
+          targetRep: val("row-t-" + i) || tpl[i][2],
+          planWeight: val("row-pl-" + i) || tpl[i][3],
+          actualWeightKg: val("row-w-" + i),
+          actualRep: val("row-r-" + i),
+          rpe: val("row-p-" + i),
+          note: val("row-n-" + i)
+        });
+      }
+      return rows;
+    }
+
+    function syncGlobalToState() {
+      app.date = val("trainDate") || todayStr();
+      app.themeSelect = val("sessionTheme") || "减脂塑形周";
+      app.customTheme = val("customTheme");
+    }
+
+    function syncRecordFormToState() {
+      if (activeView !== "record") return;
+      syncGlobalToState();
+      var p = app.people[activePersonId];
+      var oldType = p.trainingType;
+      p.rowsByType[oldType] = collectRowsForPerson(p);
+      p.trainingType = val("recordTrainingType") || oldType;
+      p.duration = val("recordDuration");
+      p.morningWeight = val("recordMorningWeight");
+      p.cardio = val("recordCardio");
+      p.feeling = val("recordFeeling");
+
+      if (p.trainingType !== oldType) {
+        var newRows = p.rowsByType[p.trainingType] || [];
+        p.rowsByType[p.trainingType] = newRows;
       }
     }
 
-    function saveHistory(arr) {
-      try {
-        localStorage.setItem(HISTORY_KEY, JSON.stringify(arr));
-      } catch (e) {
-        showMsg("历史保存失败（浏览器限制）。");
+    function renderRecordView() {
+      syncGlobalToDom();
+      var p = app.people[activePersonId];
+      text("currentPersonLabel", "当前：" + p.name);
+      set("recordPersonSelect", activePersonId);
+      set("recordTrainingType", p.trainingType);
+      set("recordDuration", p.duration);
+      set("recordMorningWeight", p.morningWeight);
+      set("recordCardio", p.cardio);
+      set("recordFeeling", p.feeling);
+      buildRecordRows(p, p.rowsByType[p.trainingType] || []);
+    }
+
+    function syncGlobalToDom() {
+      set("trainDate", app.date || todayStr());
+      set("sessionTheme", app.themeSelect || "减脂塑形周");
+      set("customTheme", app.customTheme || "");
+      toggleCustomTheme();
+    }
+
+    function hasCheckIn(person) {
+      if (!person) return false;
+      if (person.morningWeight || person.duration || person.cardio || person.feeling) return true;
+      var rows = person.rowsByType && person.rowsByType[person.trainingType] ? person.rowsByType[person.trainingType] : [];
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].actualWeightKg || rows[i].actualRep || rows[i].rpe) return true;
       }
+      return false;
+    }
+
+    function findHistoryByDate(date) {
+      var h = getHistory();
+      for (var i = 0; i < h.length; i++) {
+        if (h[i].date === date) return h[i];
+      }
+      return null;
+    }
+
+    function renderHomeStatus() {
+      syncGlobalToState();
+      var day = findHistoryByDate(app.date);
+      var pa = day ? day.people.a : app.people.a;
+      var pb = day ? day.people.b : app.people.b;
+      var doneA = hasCheckIn(pa);
+      var doneB = hasCheckIn(pb);
+      var statusA = (doneA ? "今日已打卡" : "今日未打卡") + " ｜ 晨重 " + (pa.morningWeight || "-") + "kg";
+      var statusB = (doneB ? "今日已打卡" : "今日未打卡") + " ｜ 晨重 " + (pb.morningWeight || "-") + "kg";
+
+      text("home-status-a", statusA);
+      text("home-status-b", statusB);
+      text("home-summary", "日期：" + app.date + " ｜ 主题：" + getThemeText() + " ｜ 当前选择：" + app.people[activePersonId].name);
+    }
+
+    function getThemeText() {
+      if (app.themeSelect === "自定义") return app.customTheme || "自定义";
+      return app.themeSelect || "减脂塑形周";
+    }
+
+    function mergeHistoryByDate(arr) {
+      var map = {};
+      for (var i = 0; i < arr.length; i++) {
+        var item = arr[i];
+        if (!item || !item.date) continue;
+        map[item.date] = item;
+      }
+      var out = [];
+      for (var k in map) out.push(map[k]);
+      out.sort(function(a, b){ return a.date < b.date ? 1 : -1; });
+      return out;
     }
 
     function saveToHistory() {
-      var data = collectAll();
-      var history = loadHistory();
-      var replaced = false;
+      syncRecordFormToState();
+      syncGlobalToState();
+      var payload = cloneApp();
 
-      for (var i = 0; i < history.length; i++) {
-        if (history[i].date === data.date) {
-          history[i] = data;
-          replaced = true;
-          break;
-        }
-      }
-      if (!replaced) history.push(data);
-
-      history.sort(function(a, b) { return a.date < b.date ? 1 : -1; });
+      var history = getHistory();
+      history.push(payload);
+      history = mergeHistoryByDate(history);
       saveHistory(history);
+      renderHomeStatus();
       renderHistory();
-      showMsg(replaced ? "已更新该日期历史记录。" : "已新增历史记录。");
+      showMsg("已保存到历史，共 " + history.length + " 条。可在对比页查看。");
+    }
+
+    function cloneApp() {
+      return JSON.parse(JSON.stringify(app));
     }
 
     function renderHistory() {
-      var history = loadHistory();
+      var history = getHistory();
       var box = document.getElementById("historyList");
       var sel1 = document.getElementById("compareDate1");
       var sel2 = document.getElementById("compareDate2");
-
       sel1.innerHTML = "";
       sel2.innerHTML = "";
 
       if (!history.length) {
-        box.innerHTML = "暂无历史记录。先点“保存到历史（按日期）”。";
+        box.innerHTML = "暂无历史记录。先去记录页保存“按日期历史”。";
         return;
       }
 
@@ -566,12 +863,12 @@
         var aW = item.people && item.people.a ? (item.people.a.morningWeight || "-") : "-";
         var bW = item.people && item.people.b ? (item.people.b.morningWeight || "-") : "-";
 
-        sel1.appendChild(option(item.date));
-        sel2.appendChild(option(item.date));
+        sel1.appendChild(opt(item.date));
+        sel2.appendChild(opt(item.date));
 
         html.push(
           "<div style='padding:8px;border-bottom:1px solid #e5e7eb;'>" +
-          "<div><strong>" + esc(item.date) + "</strong>｜主题：" + esc(item.themeText || "-") + "｜妞妞晨重：" + esc(aW) + "kg｜牛牛晨重：" + esc(bW) + "kg</div>" +
+          "<div><strong>" + esc(item.date) + "</strong>｜主题：" + esc(getThemeTextBy(item)) + "｜妞妞晨重：" + esc(aW) + "kg｜牛牛晨重：" + esc(bW) + "kg</div>" +
           "<div style='margin-top:6px;'>" +
           "<button class='small-btn' type='button' onclick='loadHistoryByDate(\"" + escAttr(item.date) + "\")'>加载这天</button>" +
           "<button class='small-btn' type='button' onclick='showDetailByDate(\"" + escAttr(item.date) + "\")'>查看详情</button>" +
@@ -591,23 +888,33 @@
       }
     }
 
+    function getThemeTextBy(day) {
+      if (!day) return "-";
+      if (day.themeSelect === "自定义") return day.customTheme || "自定义";
+      return day.themeSelect || "-";
+    }
+
+    function opt(v) {
+      var o = document.createElement("option");
+      o.value = v;
+      o.textContent = v;
+      return o;
+    }
+
     function escAttr(s) {
       if (s === null || s === undefined) return "";
       return String(s).replace(/\\/g, "\\\\").replace(/"/g, "\\\"");
     }
 
-    function option(v) {
-      var op = document.createElement("option");
-      op.value = v;
-      op.textContent = v;
-      return op;
-    }
-
     function loadHistoryByDate(d) {
-      var history = loadHistory();
+      var history = getHistory();
       for (var i = 0; i < history.length; i++) {
         if (history[i].date === d) {
-          applyAll(history[i]);
+          app = history[i];
+          syncGlobalToDom();
+          renderHomeStatus();
+          if (activeView === "record") renderRecordView();
+          saveDraft();
           showMsg("已加载 " + d + " 的记录。");
           return;
         }
@@ -616,26 +923,21 @@
 
     function deleteHistoryByDate(d) {
       if (!confirm("确认删除 " + d + " 的历史记录？")) return;
-      var history = loadHistory();
+      var history = getHistory();
       var next = [];
-      for (var i = 0; i < history.length; i++) {
-        if (history[i].date !== d) next.push(history[i]);
-      }
+      for (var i = 0; i < history.length; i++) if (history[i].date !== d) next.push(history[i]);
       saveHistory(next);
       renderHistory();
+      renderHomeStatus();
       showMsg("已删除 " + d + "。");
     }
 
-    function detailText(entry) {
-      return buildSummary(entry, "both");
-    }
-
     function showDetailByDate(d) {
-      var history = loadHistory();
+      var history = getHistory();
       for (var i = 0; i < history.length; i++) {
         if (history[i].date === d) {
-          var detail = document.getElementById("historyDetail");
-          if (detail) detail.textContent = detailText(history[i]);
+          var el = document.getElementById("historyDetail");
+          if (el) el.textContent = buildSummary(history[i], "both");
           return;
         }
       }
@@ -666,12 +968,11 @@
     }
 
     function compareDates() {
-      var person = getVal("comparePerson");
-      var d1 = getVal("compareDate1");
-      var d2 = getVal("compareDate2");
+      var person = val("comparePerson");
+      var d1 = val("compareDate1");
+      var d2 = val("compareDate2");
       var out = document.getElementById("compareResult");
-      var history = loadHistory();
-
+      var history = getHistory();
       var a = null, b = null;
       for (var i = 0; i < history.length; i++) {
         if (history[i].date === d1) a = history[i];
@@ -700,7 +1001,6 @@
       html.push("<div style='margin-top:6px;'>日期A：" + d1 + " ｜ 日期B：" + d2 + "</div>");
       html.push("<div style='margin-top:6px;'>晨重变化：" + (wDelta === "-" ? "-" : (wDelta > 0 ? "+" + wDelta : wDelta)) + " kg</div>");
       html.push("<div style='margin-top:8px;' class='scroll'><table><thead><tr><th>动作</th><th>A最好表现</th><th>B最好表现</th><th>重量变化(kg)</th></tr></thead><tbody>");
-
       for (k in keys) {
         var x = m1[k] || { text: "-", weight: null };
         var y = m2[k] || { text: "-", weight: null };
@@ -711,20 +1011,18 @@
         }
         html.push("<tr><td class='left'>" + esc(k) + "</td><td>" + esc(x.text) + "</td><td>" + esc(y.text) + "</td><td>" + esc(dlt) + "</td></tr>");
       }
-
       html.push("</tbody></table></div>");
       out.innerHTML = html.join("");
     }
 
     function buildSummary(data, mode) {
-      var d = data || collectAll();
+      var d = data || app;
       var lines = [];
-      lines.push("翘屁股计划｜" + (d.date || "") + "｜主题：" + (d.themeText || "-"));
+      lines.push("翘屁股计划｜" + (d.date || "") + "｜主题：" + (getThemeTextBy(d) || "-"));
 
       function one(p) {
         lines.push("");
-        lines.push("【" + p.name + "】训练类型：" + (p.trainingType || "-") + "｜时长：" + (p.duration || "-") + "分钟｜晨重：" + (p.morningWeight || "-") + "kg");
-        lines.push("热身：有氧" + (p.warmup1 || "-") + "分钟；肩胛后缩" + (p.warmup2 || "-") + "；弹力带下拉" + (p.warmup3 || "-"));
+        lines.push("【" + p.name + "】训练类型：" + (p.trainingType || "-") + "｜时长：" + (p.duration || "-") + "分钟｜空腹体重：" + (p.morningWeight || "-") + "kg");
         var rows = p.rowsByType && p.rowsByType[p.trainingType] ? p.rowsByType[p.trainingType] : [];
         lines.push("力量记录：");
         for (var i = 0; i < rows.length; i++) {
@@ -733,33 +1031,93 @@
           lines.push("- " + r.action + " 第" + r.set + "组（计划" + r.planWeight + "）=> " + (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") + "，RPE " + (r.rpe || "-") + note);
         }
         lines.push("有氧：" + (p.cardio || "-"));
-        lines.push("拉伸：" + (p.stretch || "-"));
         lines.push("感受：" + (p.feeling || "-"));
       }
 
       if (mode === "a") one(d.people.a);
       else if (mode === "b") one(d.people.b);
-      else {
-        one(d.people.a);
-        one(d.people.b);
-      }
+      else { one(d.people.a); one(d.people.b); }
       return lines.join("\n");
     }
 
+    function importJsonText(text) {
+      var parsed = JSON.parse(text);
+      if (parsed && parsed.app && parsed.history && Array.isArray(parsed.history)) {
+        app = parsed.app;
+        saveHistory(mergeHistoryByDate(parsed.history));
+        syncGlobalToDom();
+        renderHomeStatus();
+        if (activeView === "record") renderRecordView();
+        renderHistory();
+        saveDraft();
+        showMsg("已导入：当前记录 + 历史记录。");
+        return;
+      }
+      if (Array.isArray(parsed)) {
+        var mergedArr = mergeHistoryByDate(parsed);
+        saveHistory(mergedArr);
+        if (mergedArr.length) app = mergedArr[0];
+        syncGlobalToDom();
+        renderHomeStatus();
+        if (activeView === "record") renderRecordView();
+        renderHistory();
+        saveDraft();
+        showMsg("已导入：历史记录。");
+        return;
+      }
+      if (parsed && parsed.date && parsed.people) {
+        var h = getHistory();
+        h.push(parsed);
+        saveHistory(mergeHistoryByDate(h));
+        app = parsed;
+        syncGlobalToDom();
+        renderHomeStatus();
+        if (activeView === "record") renderRecordView();
+        renderHistory();
+        saveDraft();
+        showMsg("已导入：单日记录。");
+        return;
+      }
+      throw new Error("unsupported_json");
+    }
+
     function showMsg(msg) {
-      var el = document.getElementById("msg");
-      el.textContent = msg;
-      setTimeout(function() {
-        if (el.textContent === msg) el.textContent = "";
-      }, 2400);
+      var ids = ["msg", "recordMsg"];
+      for (var i = 0; i < ids.length; i++) {
+        var el = document.getElementById(ids[i]);
+        if (!el) continue;
+        el.textContent = msg;
+        (function(target, text){
+          setTimeout(function(){ if (target.textContent === text) target.textContent = ""; }, 2400);
+        })(el, msg);
+      }
+    }
+
+    function autoSaveDraftSilently() {
+      if (activeView === "record") syncRecordFormToState();
+      syncGlobalToState();
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify({ app: app, activePersonId: activePersonId }));
+      } catch (e) {}
+    }
+
+    function scheduleAutoSave() {
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(autoSaveDraftSilently, 500);
     }
 
     function copyText(text, okMsg) {
-      navigator.clipboard.writeText(text).then(function() {
-        showMsg(okMsg);
-      }).catch(function() {
-        showMsg("复制失败，请手动复制。");
-      });
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function(){
+          showMsg(okMsg);
+        }).catch(function(){
+          window.prompt("自动复制失败，请手动全选复制下面内容：", text);
+          showMsg("复制受限，已弹出手动复制窗口。");
+        });
+        return;
+      }
+      window.prompt("当前环境不支持自动复制，请手动全选复制下面内容：", text);
+      showMsg("当前环境不支持自动复制，已弹出手动复制窗口。");
     }
 
     function downloadFile(name, content, mime) {
@@ -774,47 +1132,155 @@
       URL.revokeObjectURL(url);
     }
 
-    function resetPage() {
-      if (!confirm("确认清空当前页面输入？")) return;
-      applyAll({ date: todayStr(), themeSelect: "减脂塑形周", customTheme: "", people: {} });
-      showMsg("已清空页面。");
+    function resetCurrentPage() {
+      if (!confirm("确认清空当前页数据？")) return;
+      app.people[activePersonId] = defaultPerson(activePersonId === "a" ? "妞妞" : "牛牛");
+      renderRecordView();
+      renderHomeStatus();
+      showMsg("已清空当前训练者页面数据。");
     }
 
-    function toggleCustomTheme() {
-      var wrap = document.getElementById("customThemeWrap");
-      wrap.style.display = getVal("sessionTheme") === "自定义" ? "block" : "none";
+    function val(id) {
+      var el = document.getElementById(id);
+      return el ? el.value.trim() : "";
     }
 
-    function init() {
-      setVal("trainDate", todayStr());
+    function set(id, v) {
+      var el = document.getElementById(id);
+      if (el) el.value = v || "";
+    }
 
-      document.getElementById("tab-a").addEventListener("click", function(){ setActivePerson("a"); });
-      document.getElementById("tab-b").addEventListener("click", function(){ setActivePerson("b"); });
-      document.getElementById("sessionTheme").addEventListener("change", toggleCustomTheme);
+    function text(id, t) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = t;
+    }
 
-      document.getElementById("saveDraftBtn").addEventListener("click", saveDraft);
+    function bind() {
+      var navBtns = document.querySelectorAll(".nav-btn");
+      for (var i = 0; i < navBtns.length; i++) {
+        navBtns[i].addEventListener("click", function(){ setView(this.getAttribute("data-view")); });
+      }
+
+      document.getElementById("home-person-a").addEventListener("click", function(){ setActivePerson("a"); });
+      document.getElementById("home-person-b").addEventListener("click", function(){ setActivePerson("b"); });
+      document.getElementById("gotoRecordBtn").addEventListener("click", function(){ setView("record"); });
+
+      document.getElementById("sessionTheme").addEventListener("change", function(){
+        syncGlobalToState();
+        toggleCustomTheme();
+        renderHomeStatus();
+        scheduleAutoSave();
+      });
+      document.getElementById("customTheme").addEventListener("input", function(){
+        syncGlobalToState();
+        renderHomeStatus();
+        scheduleAutoSave();
+      });
+      document.getElementById("trainDate").addEventListener("change", function(){
+        syncGlobalToState();
+        renderHomeStatus();
+        scheduleAutoSave();
+      });
+
+      document.getElementById("recordTrainingType").addEventListener("change", function(){
+        var p = app.people[activePersonId];
+        p.rowsByType[p.trainingType] = collectRowsForPerson(p);
+        p.trainingType = val("recordTrainingType") || p.trainingType;
+        buildRecordRows(p, p.rowsByType[p.trainingType] || []);
+        scheduleAutoSave();
+      });
+
+      document.getElementById("recordPersonSelect").addEventListener("change", function(){
+        var next = val("recordPersonSelect");
+        if (next !== "a" && next !== "b") return;
+        syncRecordFormToState();
+        setActivePerson(next);
+        if (activeView !== "record") setView("record");
+        scheduleAutoSave();
+      });
+
       document.getElementById("saveHistoryBtn").addEventListener("click", saveToHistory);
-      document.getElementById("copyBothBtn").addEventListener("click", function(){ copyText(buildSummary(collectAll(), "both"), "已复制双人汇总。"); });
+      document.getElementById("copyCurrentBtn").addEventListener("click", function(){
+        syncRecordFormToState();
+        copyText(buildSummary(app, activePersonId), "已复制当前训练者记录。");
+      });
+
+      document.getElementById("copyBothBtn").addEventListener("click", function(){
+        syncRecordFormToState();
+        copyText(buildSummary(app, "both"), "已复制双人汇总。\n");
+      });
 
       document.getElementById("downloadTxtBtn").addEventListener("click", function(){
-        var d = collectAll();
-        downloadFile("qiaopigu-" + (d.date || todayStr()) + ".txt", buildSummary(d, "both"), "text/plain;charset=utf-8");
+        syncRecordFormToState();
+        downloadFile("qiaopigu-" + (app.date || todayStr()) + ".txt", buildSummary(app, "both"), "text/plain;charset=utf-8");
         showMsg("已下载 TXT。");
       });
 
       document.getElementById("downloadJsonBtn").addEventListener("click", function(){
-        var d = collectAll();
-        downloadFile("qiaopigu-" + (d.date || todayStr()) + ".json", JSON.stringify(d, null, 2), "application/json");
-        showMsg("已下载 JSON。");
+        syncRecordFormToState();
+        var pack = {
+          version: "qiaopigu-v2",
+          exportedAt: new Date().toISOString(),
+          app: app,
+          history: getHistory()
+        };
+        downloadFile("qiaopigu-all-" + (app.date || todayStr()) + ".json", JSON.stringify(pack, null, 2), "application/json");
+        showMsg("已下载全部 JSON（含历史）。");
       });
 
-      document.getElementById("resetBtn").addEventListener("click", resetPage);
-      document.getElementById("compareBtn").addEventListener("click", compareDates);
-      document.getElementById("refreshHistoryBtn").addEventListener("click", renderHistory);
+      document.getElementById("importJsonBtn").addEventListener("click", function(){ document.getElementById("importJsonInput").click(); });
+      document.getElementById("importJsonInput").addEventListener("change", function(e){
+        var f = e.target.files && e.target.files[0];
+        if (!f) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          try {
+            importJsonText(String(ev.target.result || ""));
+          } catch (err) {
+            showMsg("导入失败：请确认是本页面导出的JSON。");
+          }
+          e.target.value = "";
+        };
+        reader.readAsText(f, "utf-8");
+      });
 
-      applyAll({ date: todayStr(), themeSelect: "减脂塑形周", customTheme: "", people: {} });
-      loadDraft();
+      document.getElementById("refreshHistoryBtn").addEventListener("click", renderHistory);
+      document.getElementById("compareBtn").addEventListener("click", compareDates);
+      document.getElementById("resetBtn").addEventListener("click", resetCurrentPage);
+
+      document.addEventListener("input", function(e){
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) scheduleAutoSave();
+      });
+      document.addEventListener("change", function(e){
+        if (e.target && e.target.tagName === "SELECT") scheduleAutoSave();
+      });
+    }
+
+    function init() {
+      try {
+        var k = "__qiaopigu_test__";
+        localStorage.setItem(k, "1");
+        localStorage.removeItem(k);
+        localStorageOK = true;
+      } catch (e) {
+        localStorageOK = false;
+      }
+
+      app.date = todayStr();
+      syncGlobalToDom();
+      var loaded = loadDraft();
+      if (!loaded) {
+        app.people.a.rowsByType[app.people.a.trainingType] = [];
+        app.people.b.rowsByType[app.people.b.trainingType] = [];
+      }
+      syncGlobalToDom();
+      setActivePerson(activePersonId);
+      bind();
+      renderRecordView();
+      renderHomeStatus();
       renderHistory();
+      setView("home");
+      if (!localStorageOK) showMsg("当前为受限模式：仅本次会话可保存，建议用线上链接使用。");
     }
 
     init();
