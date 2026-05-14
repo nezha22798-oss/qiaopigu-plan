@@ -227,13 +227,13 @@
     }
 
     .scroll {
-      overflow-x: auto;
+      overflow-x: hidden;
       -webkit-overflow-scrolling: touch;
     }
     table {
       border-collapse: collapse;
-      min-width: 900px;
       width: 100%;
+      table-layout: fixed;
       font-size: 13px;
       background: #fff;
     }
@@ -245,7 +245,13 @@
     }
     th { background: #f9fafb; font-weight: 700; }
     td input { min-width: 74px; padding: 7px 6px; font-size: 13px; border-radius: 8px; }
+    #recordRows input { min-width: 0; width: 100%; }
     td .narrow { min-width: 56px; }
+    th.set-col, td.set-col { width: 46px; min-width: 46px; max-width: 46px; text-align: center; }
+    th.weight-col, td.weight-col { width: 92px; min-width: 92px; max-width: 92px; }
+    th.rep-col, td.rep-col { width: 82px; min-width: 82px; max-width: 82px; }
+    th.op-col, td.op-col { width: 72px; min-width: 72px; max-width: 72px; text-align: center; }
+    td.op-col .small-btn { padding: 6px 8px; margin-right: 0; width: 100%; }
     .left { text-align: left; }
 
     .ok {
@@ -262,6 +268,24 @@
       margin-top: 10px;
       background: #f5fcf8;
     }
+    .feedback-box {
+      border: 1px solid #b9e7cb;
+      border-radius: 12px;
+      background: #f3fdf6;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .guide-box {
+      border: 1px solid #b9e7cb;
+      border-radius: 12px;
+      background: #f7fdf9;
+      padding: 10px 12px;
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
 
     .small-btn {
       width: auto;
@@ -275,6 +299,11 @@
       background: #129a5d;
     }
     .small-btn.danger { background: var(--danger); }
+    .small-btn.ghost {
+      background: #e7f8ef;
+      color: #0f8a52;
+      border: 1px solid #b7e4c8;
+    }
 
     .bottom-nav {
       position: fixed;
@@ -455,12 +484,19 @@
 
       <div class="card">
         <h2>力量记录（随训练类型变化）</h2>
+        <div style="margin-bottom:10px;">
+          <label>每日热身 + 拉伸（不记录）</label>
+          <div id="warmupGuide" class="guide-box"></div>
+        </div>
+        <div style="margin:0 0 10px 0;">
+          <button class="small-btn" id="addRowBtn" type="button">+ 新增动作</button>
+        </div>
         <div class="scroll">
           <table>
             <thead>
               <tr>
-                <th>动作（可编辑）</th><th>组次（可编辑）</th><th>目标次数/时长（可编辑）</th><th>计划重量<br>kg(lb)（可编辑）</th>
-                <th>实际重量<br>kg</th><th>实际次数/时长</th><th>RPE</th><th>备注</th>
+                <th class="set-col">组次</th><th>动作（可编辑）</th>
+                <th class="weight-col">实际重量<br>lb</th><th class="rep-col">次数</th><th class="op-col">操作</th>
               </tr>
             </thead>
             <tbody id="recordRows"></tbody>
@@ -479,6 +515,10 @@
           <button class="btn btn-secondary" id="copyCurrentBtn" type="button">复制当前训练者记录</button>
         </div>
         <div id="recordMsg" class="ok"></div>
+        <div style="margin-top:8px;">
+          <label>今日训练反馈</label>
+          <div id="recordFeedback" class="feedback-box">保存记录后，会生成今天的训练反馈。</div>
+        </div>
       </div>
     </div>
 
@@ -495,6 +535,33 @@
         </div>
         <input id="importJsonInput" type="file" accept=".json,application/json" style="display:none;">
         <div id="msg" class="ok"></div>
+      </div>
+
+      <div class="card">
+        <h2>云同步（Supabase）</h2>
+        <div class="grid grid-3">
+          <div>
+            <label for="cloudUrl">Project URL</label>
+            <input id="cloudUrl" type="text" placeholder="https://xxxx.supabase.co">
+          </div>
+          <div>
+            <label for="cloudAnonKey">Anon Key</label>
+            <input id="cloudAnonKey" type="password" placeholder="eyJ...">
+          </div>
+          <div>
+            <label for="cloudSlot">同步标识</label>
+            <input id="cloudSlot" type="text" placeholder="default">
+          </div>
+        </div>
+        <div style="margin-top:10px;" class="grid grid-3">
+          <button class="btn btn-secondary" id="saveCloudCfgBtn" type="button">保存云配置</button>
+          <button class="btn btn-secondary" id="pushCloudBtn" type="button">上传到云端</button>
+          <button class="btn btn-secondary" id="pullCloudBtn" type="button">从云端拉取</button>
+        </div>
+        <div class="muted" style="margin-top:8px;">
+          首次先在 Supabase SQL 执行：
+          <code>create table if not exists qiaopigu_sync (id text primary key, payload jsonb not null, updated_at timestamptz default now());</code>
+        </div>
       </div>
 
       <div class="card">
@@ -533,6 +600,7 @@
   <script>
     var DRAFT_KEY = "qiaopigu_plan_draft_v2";
     var HISTORY_KEY = "qiaopigu_plan_history_v2";
+    var CLOUD_CFG_KEY = "qiaopigu_cloud_cfg_v1";
     var memoryStore = { draft: null, history: [] };
     var localStorageOK = true;
 
@@ -542,35 +610,97 @@
 
     var templates = {
       "上肢B（拉）": [
-        ["高位下拉", 1, "10", "15 (33)"], ["高位下拉", 2, "10", "17.5 (38.5)"], ["高位下拉", 3, "10", "17.5 (38.5)"], ["高位下拉", 4, "10", "20 (44)"],
-        ["坐姿划船", 1, "12", "15 (33)"], ["坐姿划船", 2, "12", "17.5 (38.5)"], ["坐姿划船", 3, "12", "17.5 (38.5)"], ["坐姿划船", 4, "12", "20 (44)"],
-        ["单臂哑铃划船（每侧）", 1, "10", "5 (11)"], ["单臂哑铃划船（每侧）", 2, "10", "5 (11)"], ["单臂哑铃划船（每侧）", 3, "10", "6 (13.2)"],
-        ["直臂下压", 1, "15", "7.5 (16.5)"], ["直臂下压", 2, "15", "7.5 (16.5)"], ["直臂下压", 3, "15", "10 (22)"]
+        ["高位下拉", 1, "12", "70 lb"], ["高位下拉", 2, "12", "90 lb"], ["高位下拉", 3, "10", "110 lb"], ["高位下拉", 4, "10", "120 lb"],
+        ["坐姿划船", 1, "12", "90 lb"], ["坐姿划船", 2, "12", "110 lb"], ["坐姿划船", 3, "10", "130 lb"], ["坐姿划船", 4, "10", "155 lb"],
+        ["单臂哑铃划船（每侧）", 1, "12", "30 lb"], ["单臂哑铃划船（每侧）", 2, "10", "35 lb"], ["单臂哑铃划船（每侧）", 3, "10", "40 lb"],
+        ["直臂下压", 1, "15", "30 lb"], ["直臂下压", 2, "12", "35 lb"], ["直臂下压", 3, "12", "40 lb"]
       ],
       "上肢A（推）": [
-        ["哑铃卧推", 1, "10", "6 (13.2)"], ["哑铃卧推", 2, "10", "6 (13.2)"], ["哑铃卧推", 3, "10", "8 (17.6)"], ["哑铃卧推", 4, "10", "8 (17.6)"],
-        ["上斜哑铃推举", 1, "10", "5 (11)"], ["上斜哑铃推举", 2, "10", "6 (13.2)"], ["上斜哑铃推举", 3, "10", "6 (13.2)"],
-        ["坐姿推肩", 1, "10", "5 (11)"], ["坐姿推肩", 2, "10", "5 (11)"], ["坐姿推肩", 3, "10", "6 (13.2)"],
-        ["侧平举", 1, "15", "2 (4.4)"], ["侧平举", 2, "15", "2 (4.4)"], ["侧平举", 3, "15", "3 (6.6)"]
+        ["哑铃卧推", 1, "10", "20 lb"], ["哑铃卧推", 2, "10", "20 lb"], ["哑铃卧推", 3, "8", "25 lb"], ["哑铃卧推", 4, "8", "25 lb"],
+        ["上斜哑铃推举", 1, "10", "15 lb"], ["上斜哑铃推举", 2, "10", "20 lb"], ["上斜哑铃推举", 3, "8", "20 lb"],
+        ["坐姿推肩", 1, "10", "15 lb"], ["坐姿推肩", 2, "10", "15 lb"], ["坐姿推肩", 3, "8", "20 lb"],
+        ["侧平举", 1, "15", "8 lb"], ["侧平举", 2, "15", "8 lb"], ["侧平举", 3, "12", "10 lb"]
       ],
       "腿1（臀主导）": [
-        ["高脚杯深蹲", 1, "10", "8 (17.6)"], ["高脚杯深蹲", 2, "10", "10 (22)"], ["高脚杯深蹲", 3, "10", "10 (22)"], ["高脚杯深蹲", 4, "10", "12 (26.4)"],
-        ["杠铃臀推", 1, "12", "20 (44)"], ["杠铃臀推", 2, "12", "25 (55)"], ["杠铃臀推", 3, "12", "30 (66)"], ["杠铃臀推", 4, "12", "30 (66)"],
-        ["腿举机", 1, "12", "40 (88)"], ["腿举机", 2, "12", "50 (110)"], ["腿举机", 3, "12", "60 (132)"],
-        ["哑铃罗马尼亚硬拉", 1, "12", "6 (13.2)"], ["哑铃罗马尼亚硬拉", 2, "12", "6 (13.2)"], ["哑铃罗马尼亚硬拉", 3, "12", "8 (17.6)"]
+        ["高脚杯深蹲", 1, "12", "25 lb"], ["高脚杯深蹲", 2, "10", "30 lb"], ["高脚杯深蹲", 3, "10", "35 lb"], ["高脚杯深蹲", 4, "8", "40 lb"],
+        ["杠铃臀推", 1, "12", "95 lb"], ["杠铃臀推", 2, "10", "115 lb"], ["杠铃臀推", 3, "10", "135 lb"], ["杠铃臀推", 4, "8", "145 lb"],
+        ["腿举机", 1, "12", "140 lb"], ["腿举机", 2, "10", "180 lb"], ["腿举机", 3, "10", "220 lb"],
+        ["哑铃罗马尼亚硬拉", 1, "12", "20 lb"], ["哑铃罗马尼亚硬拉", 2, "10", "25 lb"], ["哑铃罗马尼亚硬拉", 3, "10", "30 lb"]
       ],
       "腿2（臀腿）": [
-        ["保加利亚分腿蹲（每侧）", 1, "10", "4 (8.8)"], ["保加利亚分腿蹲（每侧）", 2, "10", "5 (11)"], ["保加利亚分腿蹲（每侧）", 3, "10", "6 (13.2)"],
-        ["杠铃臀推", 1, "10", "25 (55)"], ["杠铃臀推", 2, "10", "30 (66)"], ["杠铃臀推", 3, "10", "35 (77)"], ["杠铃臀推", 4, "10", "35 (77)"],
-        ["腿弯举", 1, "15", "15 (33)"], ["腿弯举", 2, "15", "20 (44)"], ["腿弯举", 3, "15", "20 (44)"],
-        ["髋外展机", 1, "20", "25 (55)"], ["髋外展机", 2, "20", "30 (66)"], ["髋外展机", 3, "20", "35 (77)"]
+        ["保加利亚分腿蹲（每侧）", 1, "12", "15 lb"], ["保加利亚分腿蹲（每侧）", 2, "10", "20 lb"], ["保加利亚分腿蹲（每侧）", 3, "10", "25 lb"],
+        ["杠铃臀推", 1, "10", "115 lb"], ["杠铃臀推", 2, "10", "135 lb"], ["杠铃臀推", 3, "8", "155 lb"], ["杠铃臀推", 4, "8", "165 lb"],
+        ["腿弯举", 1, "15", "50 lb"], ["腿弯举", 2, "12", "60 lb"], ["腿弯举", 3, "12", "70 lb"],
+        ["髋外展机", 1, "20", "70 lb"], ["髋外展机", 2, "20", "90 lb"], ["髋外展机", 3, "15", "110 lb"]
       ],
       "有氧+核心": [
         ["平板支撑", 1, "45秒", "-"], ["平板支撑", 2, "45秒", "-"], ["平板支撑", 3, "45秒", "-"],
         ["死虫", 1, "12/侧", "-"], ["死虫", 2, "12/侧", "-"], ["死虫", 3, "12/侧", "-"],
-        ["俄罗斯转体", 1, "20", "4 (8.8)"], ["俄罗斯转体", 2, "20", "4 (8.8)"], ["俄罗斯转体", 3, "20", "4 (8.8)"],
+        ["俄罗斯转体", 1, "20", "10 lb"], ["俄罗斯转体", 2, "20", "10 lb"], ["俄罗斯转体", 3, "20", "10 lb"],
         ["跑步机坡走", 1, "15分钟", "-"], ["椭圆机", 1, "10分钟", "-"]
       ]
+    };
+
+    var warmupStretchGuides = {
+      "上肢B（拉）": [
+        "热身（8-10分钟）",
+        "1. 跑步机快走或椭圆机 5 分钟",
+        "2. 肩部绕环 + 胸椎旋转 各 12 次",
+        "3. 弹力带下拉 2 组 x 15 次",
+        "4. 高位下拉空杆/轻重量 2 组 x 12 次",
+        "",
+        "拉伸（6-8分钟）",
+        "1. 背阔肌拉伸 每侧 30-40 秒 x 2",
+        "2. 后三角拉伸 每侧 30 秒 x 2",
+        "3. 斜方肌放松拉伸 每侧 30 秒 x 2"
+      ].join("\n"),
+      "上肢A（推）": [
+        "热身（8-10分钟）",
+        "1. 单车或快走 5 分钟",
+        "2. 肩部绕环 + 手臂前后摆 各 15 次",
+        "3. 弹力带外旋 2 组 x 15 次",
+        "4. 哑铃卧推轻重量 2 组 x 12 次",
+        "",
+        "拉伸（6-8分钟）",
+        "1. 胸大肌门框拉伸 每侧 30-40 秒 x 2",
+        "2. 三角肌前束拉伸 每侧 30 秒 x 2",
+        "3. 肱三头肌拉伸 每侧 30 秒 x 2"
+      ].join("\n"),
+      "腿1（臀主导）": [
+        "热身（10-12分钟）",
+        "1. 坡走或单车 5 分钟",
+        "2. 髋关节绕环 + 深蹲开髋 各 12 次",
+        "3. 弹力带侧走 2 组 x 15 步/侧",
+        "4. 臀桥激活 2 组 x 15 次",
+        "",
+        "拉伸（8-10分钟）",
+        "1. 臀肌拉伸 每侧 40 秒 x 2",
+        "2. 腘绳肌拉伸 每侧 40 秒 x 2",
+        "3. 髋屈肌拉伸 每侧 40 秒 x 2"
+      ].join("\n"),
+      "腿2（臀腿）": [
+        "热身（10-12分钟）",
+        "1. 快走 5 分钟",
+        "2. 弓步转髋 + 腿后侧动态拉伸 各 10 次",
+        "3. 髋外展机轻重量 2 组 x 20 次",
+        "4. 保加利亚分腿蹲徒手 1-2 组 x 10 次",
+        "",
+        "拉伸（8-10分钟）",
+        "1. 股四头肌拉伸 每侧 40 秒 x 2",
+        "2. 臀中肌拉伸 每侧 40 秒 x 2",
+        "3. 小腿拉伸 每侧 40 秒 x 2"
+      ].join("\n"),
+      "有氧+核心": [
+        "热身（6-8分钟）",
+        "1. 低强度有氧 5 分钟",
+        "2. 猫牛式 + 胸椎旋转 各 10 次",
+        "3. 核心激活（死虫）1 组 x 10 次/侧",
+        "",
+        "拉伸（6-8分钟）",
+        "1. 腹斜肌拉伸 每侧 30 秒 x 2",
+        "2. 下背部放松拉伸 40 秒 x 2",
+        "3. 髋屈肌拉伸 每侧 30 秒 x 2"
+      ].join("\n")
     };
 
     var app = {
@@ -591,7 +721,8 @@
         morningWeight: "",
         rowsByType: {},
         cardio: "",
-        feeling: ""
+        feeling: "",
+        feedback: ""
       };
     }
 
@@ -634,6 +765,116 @@
         showMsg("已保存草稿。");
       } catch (e) {
         showMsg("草稿保存失败（浏览器限制）。");
+      }
+    }
+
+    function loadCloudConfig() {
+      try {
+        var raw = localStorage.getItem(CLOUD_CFG_KEY);
+        if (!raw) return { url: "", anonKey: "", slot: "default" };
+        var c = JSON.parse(raw) || {};
+        return {
+          url: c.url || "",
+          anonKey: c.anonKey || "",
+          slot: c.slot || "default"
+        };
+      } catch (e) {
+        return { url: "", anonKey: "", slot: "default" };
+      }
+    }
+
+    function saveCloudConfig() {
+      var c = {
+        url: val("cloudUrl"),
+        anonKey: val("cloudAnonKey"),
+        slot: val("cloudSlot") || "default"
+      };
+      try {
+        localStorage.setItem(CLOUD_CFG_KEY, JSON.stringify(c));
+        showMsg("云配置已保存。");
+      } catch (e) {
+        showMsg("云配置保存失败。");
+      }
+      return c;
+    }
+
+    function renderCloudConfig() {
+      var c = loadCloudConfig();
+      set("cloudUrl", c.url);
+      set("cloudAnonKey", c.anonKey);
+      set("cloudSlot", c.slot);
+    }
+
+    function getCloudConfigOrThrow() {
+      var c = {
+        url: val("cloudUrl"),
+        anonKey: val("cloudAnonKey"),
+        slot: val("cloudSlot") || "default"
+      };
+      if (!c.url || !c.anonKey) throw new Error("missing_cloud_config");
+      return c;
+    }
+
+    async function pushToCloud() {
+      try {
+        syncRecordFormToState();
+        syncGlobalToState();
+        var c = getCloudConfigOrThrow();
+        saveCloudConfig();
+        var endpoint = c.url.replace(/\/$/, "") + "/rest/v1/qiaopigu_sync?on_conflict=id";
+        var pack = {
+          version: "qiaopigu-v2",
+          exportedAt: new Date().toISOString(),
+          app: app,
+          history: getHistory()
+        };
+        var body = [{
+          id: c.slot,
+          payload: pack,
+          updated_at: new Date().toISOString()
+        }];
+        var res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "apikey": c.anonKey,
+            "Authorization": "Bearer " + c.anonKey,
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates,return=representation"
+          },
+          body: JSON.stringify(body)
+        });
+        if (!res.ok) throw new Error("cloud_push_failed_" + res.status);
+        showMsg("已上传到云端。");
+      } catch (e) {
+        if (String(e && e.message).indexOf("missing_cloud_config") >= 0) showMsg("请先填写并保存云配置。");
+        else showMsg("上传失败，请检查 Supabase 配置和建表语句。");
+      }
+    }
+
+    async function pullFromCloud() {
+      try {
+        var c = getCloudConfigOrThrow();
+        saveCloudConfig();
+        var endpoint = c.url.replace(/\/$/, "") + "/rest/v1/qiaopigu_sync?id=eq." + encodeURIComponent(c.slot) + "&select=payload,updated_at&limit=1";
+        var res = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "apikey": c.anonKey,
+            "Authorization": "Bearer " + c.anonKey,
+            "Content-Type": "application/json"
+          }
+        });
+        if (!res.ok) throw new Error("cloud_pull_failed_" + res.status);
+        var rows = await res.json();
+        if (!rows || !rows.length || !rows[0].payload) {
+          showMsg("云端暂无记录。");
+          return;
+        }
+        importJsonText(JSON.stringify(rows[0].payload));
+        showMsg("已从云端拉取最新记录。");
+      } catch (e) {
+        if (String(e && e.message).indexOf("missing_cloud_config") >= 0) showMsg("请先填写并保存云配置。");
+        else showMsg("拉取失败，请检查 Supabase 配置。");
       }
     }
 
@@ -690,45 +931,110 @@
 
     function buildRecordRows(person, preloadRows) {
       var tbody = document.getElementById("recordRows");
-      var tpl = templates[person.trainingType] || [];
+      var rows = (preloadRows && preloadRows.length) ? preloadRows : getDefaultRowsForType(person.trainingType);
+      rows = normalizeRowSets(rows);
       tbody.innerHTML = "";
-      for (var i = 0; i < tpl.length; i++) {
-        var t = tpl[i];
-        var s = preloadRows && preloadRows[i] ? preloadRows[i] : null;
-        var actionVal = (s && s.action !== undefined && s.action !== null && s.action !== "") ? s.action : t[0];
-        var setVal = (s && s.set !== undefined && s.set !== null && s.set !== "") ? s.set : t[1];
-        var targetVal = (s && s.targetRep !== undefined && s.targetRep !== null && s.targetRep !== "") ? s.targetRep : t[2];
-        var planVal = (s && s.planWeight !== undefined && s.planWeight !== null && s.planWeight !== "") ? s.planWeight : t[3];
+      for (var i = 0; i < rows.length; i++) {
+        var s = rows[i] || {};
         var tr = document.createElement("tr");
+        tr.setAttribute("data-row-index", String(i));
         tr.innerHTML =
-          "<td><input id='row-a-" + i + "' value='" + esc(actionVal) + "'></td>" +
-          "<td><input id='row-s-" + i + "' class='narrow' value='" + esc(setVal) + "'></td>" +
-          "<td><input id='row-t-" + i + "' class='narrow' value='" + esc(targetVal) + "'></td>" +
-          "<td><input id='row-pl-" + i + "' class='narrow' value='" + esc(planVal) + "'></td>" +
-          "<td><input id='row-w-" + i + "' class='narrow' inputmode='decimal' value='" + esc(s ? s.actualWeightKg : "") + "'></td>" +
-          "<td><input id='row-r-" + i + "' class='narrow' value='" + esc(s ? s.actualRep : "") + "'></td>" +
-          "<td><input id='row-p-" + i + "' class='narrow' inputmode='decimal' value='" + esc(s ? s.rpe : "") + "'></td>" +
-          "<td><input id='row-n-" + i + "' value='" + esc(s ? s.note : "") + "'></td>";
+          "<td class='set-col'>" + esc(s.set || "") + "</td>" +
+          "<td><input id='row-a-" + i + "' value='" + esc(s.action || "") + "'></td>" +
+          "<td class='weight-col'><input id='row-w-" + i + "' class='narrow' inputmode='decimal' value='" + esc(s ? s.actualWeightKg : "") + "'></td>" +
+          "<td class='rep-col'><input id='row-r-" + i + "' class='narrow' inputmode='numeric' value='" + esc(s ? s.actualRep : "") + "'></td>" +
+          "<td class='op-col'><button class='small-btn danger row-del-btn' type='button' data-row-index='" + i + "'>删除</button></td>";
         tbody.appendChild(tr);
       }
     }
 
     function collectRowsForPerson(person) {
-      var tpl = templates[person.trainingType] || [];
+      var tbody = document.getElementById("recordRows");
+      var trs = tbody ? tbody.querySelectorAll("tr") : [];
       var rows = [];
-      for (var i = 0; i < tpl.length; i++) {
+      for (var i = 0; i < trs.length; i++) {
         rows.push({
-          action: val("row-a-" + i) || tpl[i][0],
-          set: val("row-s-" + i) || tpl[i][1],
-          targetRep: val("row-t-" + i) || tpl[i][2],
-          planWeight: val("row-pl-" + i) || tpl[i][3],
+          action: val("row-a-" + i),
+          set: "",
+          planWeight: "",
           actualWeightKg: val("row-w-" + i),
           actualRep: val("row-r-" + i),
-          rpe: val("row-p-" + i),
-          note: val("row-n-" + i)
+          rpe: "",
+          note: ""
         });
       }
-      return rows;
+      if (!rows.length) rows = getDefaultRowsForType(person.trainingType);
+      return normalizeRowSets(rows);
+    }
+
+    function getDefaultRowsForType(type) {
+      var tpl = templates[type] || [];
+      var out = [];
+      for (var i = 0; i < tpl.length; i++) {
+        out.push({
+          action: tpl[i][0],
+          set: tpl[i][1],
+          planWeight: tpl[i][3],
+          actualWeightKg: "",
+          actualRep: "",
+          rpe: "",
+          note: ""
+        });
+      }
+      return normalizeRowSets(out);
+    }
+
+    function normalizeRowSets(rows) {
+      var list = Array.isArray(rows) ? rows : [];
+      var counter = {};
+      var blankCount = 0;
+      for (var i = 0; i < list.length; i++) {
+        var actionName = String((list[i] && list[i].action) || "").trim();
+        if (!actionName) {
+          blankCount += 1;
+          list[i].set = blankCount;
+          continue;
+        }
+        counter[actionName] = (counter[actionName] || 0) + 1;
+        list[i].set = counter[actionName];
+      }
+      return list;
+    }
+
+    function addRecordRow() {
+      syncRecordFormToState();
+      var p = app.people[activePersonId];
+      var rows = p.rowsByType[p.trainingType] || getDefaultRowsForType(p.trainingType);
+      var last = rows.length ? rows[rows.length - 1] : null;
+      rows.push({
+        action: last && last.action ? last.action : "",
+        set: "",
+        planWeight: "",
+        actualWeightKg: "",
+        actualRep: "",
+        rpe: "",
+        note: ""
+      });
+      p.rowsByType[p.trainingType] = normalizeRowSets(rows);
+      buildRecordRows(p, p.rowsByType[p.trainingType]);
+      scheduleAutoSave();
+      showMsg("已新增1个动作行。");
+    }
+
+    function deleteRecordRow(index) {
+      syncRecordFormToState();
+      var p = app.people[activePersonId];
+      var rows = p.rowsByType[p.trainingType] || [];
+      if (!rows.length) return;
+      if (rows.length === 1) {
+        showMsg("至少保留1个动作行。");
+        return;
+      }
+      rows.splice(index, 1);
+      p.rowsByType[p.trainingType] = normalizeRowSets(rows);
+      buildRecordRows(p, p.rowsByType[p.trainingType]);
+      scheduleAutoSave();
+      showMsg("已删除该动作行。");
     }
 
     function syncGlobalToState() {
@@ -765,7 +1071,14 @@
       set("recordMorningWeight", p.morningWeight);
       set("recordCardio", p.cardio);
       set("recordFeeling", p.feeling);
+      renderWarmupGuide(p.trainingType);
+      text("recordFeedback", p.feedback || "保存记录后，会生成今天的训练反馈。");
       buildRecordRows(p, p.rowsByType[p.trainingType] || []);
+    }
+
+    function renderWarmupGuide(trainingType) {
+      var guide = warmupStretchGuides[trainingType] || "热身 8-10 分钟 + 拉伸 6-8 分钟（按当天训练部位执行）。";
+      text("warmupGuide", guide);
     }
 
     function syncGlobalToDom() {
@@ -829,6 +1142,8 @@
     function saveToHistory() {
       syncRecordFormToState();
       syncGlobalToState();
+      app.people[activePersonId].feedback = generateSessionFeedback(app.people[activePersonId], getHistory(), app.date, activePersonId);
+      text("recordFeedback", app.people[activePersonId].feedback);
       var payload = cloneApp();
 
       var history = getHistory();
@@ -838,6 +1153,95 @@
       renderHomeStatus();
       renderHistory();
       showMsg("已保存到历史，共 " + history.length + " 条。可在对比页查看。");
+    }
+
+    function toNum(v) {
+      var n = parseFloat(v);
+      return isNaN(n) ? null : n;
+    }
+
+    function parsePlanKg(planText) {
+      if (!planText) return null;
+      var m = String(planText).match(/-?\d+(?:\.\d+)?/);
+      if (!m) return null;
+      var n = parseFloat(m[0]);
+      return isNaN(n) ? null : n;
+    }
+
+    function collectSessionStats(person) {
+      var rows = person.rowsByType && person.rowsByType[person.trainingType] ? person.rowsByType[person.trainingType] : [];
+      var total = rows.length || 0;
+      var logged = 0;
+      var rpeTotal = 0;
+      var rpeCount = 0;
+      var topWeight = null;
+      var planMatchSum = 0;
+      var planMatchCount = 0;
+      for (var i = 0; i < rows.length; i++) {
+        var r = rows[i];
+        var aw = toNum(r.actualWeightKg);
+        var ar = toNum(r.actualRep);
+        var ap = toNum(r.rpe);
+        var pw = parsePlanKg(r.planWeight);
+        if ((aw !== null) || (ar !== null) || (ap !== null)) logged++;
+        if (ap !== null) { rpeTotal += ap; rpeCount++; }
+        if (aw !== null && (topWeight === null || aw > topWeight)) topWeight = aw;
+        if (aw !== null && pw !== null && pw > 0) {
+          planMatchSum += (aw / pw);
+          planMatchCount++;
+        }
+      }
+      return {
+        total: total,
+        logged: logged,
+        completion: total ? (logged / total) : 0,
+        avgRpe: rpeCount ? (rpeTotal / rpeCount) : null,
+        topWeight: topWeight,
+        planRatio: planMatchCount ? (planMatchSum / planMatchCount) : null
+      };
+    }
+
+    function findPrevSameType(history, personId, trainingType, date) {
+      var arr = Array.isArray(history) ? history.slice() : [];
+      arr.sort(function(a, b){ return a.date > b.date ? -1 : 1; });
+      for (var i = 0; i < arr.length; i++) {
+        var day = arr[i];
+        if (!day || !day.people || !day.people[personId]) continue;
+        if (!day.date || day.date >= date) continue;
+        var p = day.people[personId];
+        if (p.trainingType !== trainingType) continue;
+        return p;
+      }
+      return null;
+    }
+
+    function generateSessionFeedback(person, history, date, personId) {
+      var s = collectSessionStats(person);
+      var lines = [];
+      var completionPct = Math.round((s.completion || 0) * 100);
+      lines.push("完成度：" + completionPct + "%（" + s.logged + "/" + s.total + " 组有记录）");
+
+      if (s.completion >= 0.85) lines.push("执行：记录完整度很高，训练质量不错。");
+      else if (s.completion >= 0.6) lines.push("执行：完成度中等，下一次尽量把每组都记录上。");
+      else lines.push("执行：今天记录偏少，建议先保证主动作都留痕。");
+
+      var prev = findPrevSameType(history, personId, person.trainingType, date || todayStr());
+      if (prev) {
+        var prevStats = collectSessionStats(prev);
+        if (s.topWeight !== null && prevStats.topWeight !== null) {
+          var d = (s.topWeight - prevStats.topWeight).toFixed(1);
+          if (parseFloat(d) > 0) lines.push("进步：同类型训练最高重量 +" + d + "lb，进步很棒。");
+          else if (parseFloat(d) < 0) lines.push("变化：同类型训练最高重量 " + d + "lb，可能疲劳偏高，注意恢复。");
+          else lines.push("稳定：同类型训练最高重量与上次持平。");
+        }
+      } else {
+        lines.push("基线：这是该类型首次记录，后续会自动对比进步。");
+      }
+
+      if (completionPct < 60) lines.push("建议：今天优先把主动作记录完整，下次反馈会更精准。");
+      else lines.push("建议：下次保持同样完成度，重点关注主动作逐周小幅加重。");
+
+      return lines.join("\n");
     }
 
     function cloneApp() {
@@ -956,11 +1360,12 @@
         var k = r.action;
         var w = parseNum(r.actualWeightKg);
         var rep = parseNum(r.actualRep);
-        if (!map[k]) map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") };
+        var repTxt = r.actualRep ? (" x " + r.actualRep) : "";
+        if (!map[k]) map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "lb" + repTxt };
         else {
           var oldW = map[k].weight;
           if (w !== null && (oldW === null || w > oldW)) {
-            map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") };
+            map[k] = { weight: w, rep: rep, text: (r.actualWeightKg || "-") + "lb" + repTxt };
           }
         }
       }
@@ -1000,7 +1405,7 @@
       html.push("<div><strong>对比结果（" + (person === "a" ? "妞妞" : "牛牛") + "）</strong></div>");
       html.push("<div style='margin-top:6px;'>日期A：" + d1 + " ｜ 日期B：" + d2 + "</div>");
       html.push("<div style='margin-top:6px;'>晨重变化：" + (wDelta === "-" ? "-" : (wDelta > 0 ? "+" + wDelta : wDelta)) + " kg</div>");
-      html.push("<div style='margin-top:8px;' class='scroll'><table><thead><tr><th>动作</th><th>A最好表现</th><th>B最好表现</th><th>重量变化(kg)</th></tr></thead><tbody>");
+      html.push("<div style='margin-top:8px;' class='scroll'><table><thead><tr><th>动作</th><th>A最好表现</th><th>B最好表现</th><th>重量变化(lb)</th></tr></thead><tbody>");
       for (k in keys) {
         var x = m1[k] || { text: "-", weight: null };
         var y = m2[k] || { text: "-", weight: null };
@@ -1027,11 +1432,12 @@
         lines.push("力量记录：");
         for (var i = 0; i < rows.length; i++) {
           var r = rows[i];
-          var note = r.note ? (" 备注:" + r.note) : "";
-          lines.push("- " + r.action + " 第" + r.set + "组（计划" + r.planWeight + "）=> " + (r.actualWeightKg || "-") + "kg x " + (r.actualRep || "-") + "，RPE " + (r.rpe || "-") + note);
+          var repTxt = r.actualRep ? (" x " + r.actualRep) : "";
+          lines.push("- 第" + r.set + "组 " + r.action + " => " + (r.actualWeightKg || "-") + "lb" + repTxt);
         }
         lines.push("有氧：" + (p.cardio || "-"));
         lines.push("感受：" + (p.feeling || "-"));
+        lines.push("反馈：" + (p.feedback || "-"));
       }
 
       if (mode === "a") one(d.people.a);
@@ -1186,6 +1592,7 @@
         var p = app.people[activePersonId];
         p.rowsByType[p.trainingType] = collectRowsForPerson(p);
         p.trainingType = val("recordTrainingType") || p.trainingType;
+        renderWarmupGuide(p.trainingType);
         buildRecordRows(p, p.rowsByType[p.trainingType] || []);
         scheduleAutoSave();
       });
@@ -1196,6 +1603,24 @@
         syncRecordFormToState();
         setActivePerson(next);
         if (activeView !== "record") setView("record");
+        scheduleAutoSave();
+      });
+
+      document.getElementById("addRowBtn").addEventListener("click", addRecordRow);
+      document.getElementById("recordRows").addEventListener("click", function(e){
+        var t = e.target;
+        if (!t || !t.classList || !t.classList.contains("row-del-btn")) return;
+        var idx = parseInt(t.getAttribute("data-row-index"), 10);
+        if (isNaN(idx)) return;
+        deleteRecordRow(idx);
+      });
+      document.getElementById("recordRows").addEventListener("change", function(e){
+        var t = e.target;
+        if (!t || !t.id || t.id.indexOf("row-a-") !== 0) return;
+        syncRecordFormToState();
+        var p = app.people[activePersonId];
+        p.rowsByType[p.trainingType] = normalizeRowSets(p.rowsByType[p.trainingType] || []);
+        buildRecordRows(p, p.rowsByType[p.trainingType]);
         scheduleAutoSave();
       });
 
@@ -1247,6 +1672,9 @@
       document.getElementById("refreshHistoryBtn").addEventListener("click", renderHistory);
       document.getElementById("compareBtn").addEventListener("click", compareDates);
       document.getElementById("resetBtn").addEventListener("click", resetCurrentPage);
+      document.getElementById("saveCloudCfgBtn").addEventListener("click", saveCloudConfig);
+      document.getElementById("pushCloudBtn").addEventListener("click", function(){ pushToCloud(); });
+      document.getElementById("pullCloudBtn").addEventListener("click", function(){ pullFromCloud(); });
 
       document.addEventListener("input", function(e){
         if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) scheduleAutoSave();
@@ -1279,6 +1707,7 @@
       renderRecordView();
       renderHomeStatus();
       renderHistory();
+      renderCloudConfig();
       setView("home");
       if (!localStorageOK) showMsg("当前为受限模式：仅本次会话可保存，建议用线上链接使用。");
     }
